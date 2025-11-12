@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1281142150020068269}
   - component: {fileID: 4728911528325069738}
   - component: {fileID: 4739231190065120934}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Snout
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -119,7 +119,7 @@ GameObject:
   - component: {fileID: 309013917499451621}
   - component: {fileID: 7568786862730674190}
   - component: {fileID: 2811265154100508934}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -226,7 +226,7 @@ GameObject:
   - component: {fileID: 2290594771393677225}
   - component: {fileID: 4630253006488756584}
   - component: {fileID: 1654103072918807619}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -332,9 +332,9 @@ GameObject:
   - component: {fileID: 269527081401771485}
   - component: {fileID: -3789963011428242122}
   - component: {fileID: -3255201387603132592}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Base Rat
-  m_TagString: Untagged
+  m_TagString: Rat
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -374,6 +374,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   directionChangeInterval: 2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 1
   points: 100
 --- !u!54 &269527081401771485
 Rigidbody:
@@ -400,7 +403,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 120
   m_CollisionDetection: 0
 --- !u!65 &-3789963011428242122
 BoxCollider:
@@ -437,6 +440,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   directionChangeInterval: 2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 1
   points: 100
 --- !u!1 &7775815099856742177
 GameObject:
@@ -450,7 +456,7 @@ GameObject:
   - component: {fileID: 3835512715117739671}
   - component: {fileID: 9044445225231405819}
   - component: {fileID: 3344547259534363103}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LeftEar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -555,7 +561,7 @@ GameObject:
   - component: {fileID: 1285275376690366961}
   - component: {fileID: 7912349458975692281}
   - component: {fileID: 8741327324049899578}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -662,7 +668,7 @@ GameObject:
   - component: {fileID: 3214626640379218917}
   - component: {fileID: 9177741684214199023}
   - component: {fileID: 6204798632680388350}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RightEar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
