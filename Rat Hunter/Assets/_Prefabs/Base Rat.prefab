@@ -328,10 +328,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8076507998605794624}
-  - component: {fileID: 4877969174226400775}
   - component: {fileID: 269527081401771485}
   - component: {fileID: -3789963011428242122}
-  - component: {fileID: -3255201387603132592}
+  - component: {fileID: 2724803102466090038}
   m_Layer: 7
   m_Name: Base Rat
   m_TagString: Rat
@@ -360,24 +359,6 @@ Transform:
   - {fileID: 7569396444122651321}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4877969174226400775
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5681190576489505949}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69233e4d634a0784682eab137484dcff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 3
-  directionChangeInterval: 2
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 1
-  points: 100
 --- !u!54 &269527081401771485
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -426,7 +407,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &-3255201387603132592
+--- !u!114 &2724803102466090038
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -435,14 +416,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 5681190576489505949}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69233e4d634a0784682eab137484dcff, type: 3}
+  m_Script: {fileID: 11500000, guid: 9e2b45ef13d670a44afa028c740fc0fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentState: 0
   moveSpeed: 3
+  tranquilizedSpeedMultiplier: 0.25
   directionChangeInterval: 2
   groundLayer:
     serializedVersion: 2
     m_Bits: 1
+  tranquilizedDuration: 3
   points: 100
 --- !u!1 &7775815099856742177
 GameObject:

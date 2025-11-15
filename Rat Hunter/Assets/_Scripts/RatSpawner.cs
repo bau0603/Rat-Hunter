@@ -1,8 +1,10 @@
-using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class RatSpawner : MonoBehaviour
 {
+
     [Header("Spawning Settings")]
     public GameObject ratPrefab;
     public float minSpawnTime = 1f;
