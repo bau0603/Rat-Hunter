@@ -1,12 +1,24 @@
-using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class RatController : MonoBehaviour
 {
+    public enum RatState { Normal, Tranquilized, Captured }
+
+    [Header("Rat State")]
+    public RatState currentState = RatState.Normal;
+
     [Header("Movement Settings")]
     public float moveSpeed = 3f;
+    public float tranquilizedSpeedMultiplier = 0.25f;
     public float directionChangeInterval = 2f;
     public LayerMask groundLayer = 1; // Default layer
+
+    [Header("Tranquilizer Settings")]
+    public float tranquilizedDuration = 3.0f; // How long the tranquilized effect lasts
+    private Coroutine tranquilizedCoroutine;
+    private float currentMoveSpeed; // Tracks the current active speed
 
     [Header("Points")]
     public int points = 100;
@@ -14,14 +26,19 @@ public class RatController : MonoBehaviour
     private Vector3 movementDirection;
     private float directionTimer;
     private Camera mainCamera;
-    private bool isDead = false;
     private Rigidbody rb;
     private float groundYPosition;
 
-    void Start()
+    void Awake()
     {
         mainCamera = Camera.main;
         rb = GetComponent<Rigidbody>();
+        currentMoveSpeed = moveSpeed;
+        if (mainCamera == null)
+        {
+            Debug.LogError("RatController could not find the Main Camera! Please tag your main camera as 'MainCamera'.");
+            enabled = false; // Disable the script to prevent constant errors
+        }
 
         // Find ground level at spawn position
         FindGroundLevel();
@@ -42,7 +59,7 @@ public class RatController : MonoBehaviour
 
     void Update()
     {
-        if (isDead) return;
+        if (currentState == RatState.Captured) return;
 
         // Change direction periodically
         directionTimer += Time.deltaTime;
@@ -59,10 +76,14 @@ public class RatController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isDead) return;
+        if (currentState == RatState.Captured)
+        {
+            if (rb != null) rb.velocity = Vector3.zero;
+            return;
+        }
 
         // Move the rat horizontally while maintaining ground level
-        Vector3 horizontalMovement = new Vector3(movementDirection.x, 0, movementDirection.z) * moveSpeed;
+        Vector3 horizontalMovement = new Vector3(movementDirection.x, 0, movementDirection.z) * currentMoveSpeed;
         if (rb != null)
         {
             rb.velocity = new Vector3(horizontalMovement.x, rb.velocity.y, horizontalMovement.z);
@@ -97,6 +118,17 @@ public class RatController : MonoBehaviour
 
     void KeepInBounds()
     {
+        if (mainCamera == null)
+        {
+            // This attempts to find any active camera tagged "MainCamera"
+            mainCamera = Camera.main; 
+            
+            if (mainCamera == null)
+            {
+                // If still null, we can't do the bounds check, so return early.
+                return; 
+            }
+        }
         Vector3 viewportPos = mainCamera.WorldToViewportPoint(transform.position);
 
         // Reverse direction if hitting screen edges
@@ -121,37 +153,96 @@ public class RatController : MonoBehaviour
     }
 
     // Called when rat is shot
-    public void OnShot()
+    public void OnShot(Projectile.ProjectileType type)
     {
-        if (isDead) return;
+        if (currentState == RatState.Captured) return;
 
-        isDead = true;
-
-        // Stop movement
-        if (rb != null)
+        if (type == Projectile.ProjectileType.Tranquilizer)
         {
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
+            // 1. Tranquilizer Hit
+            if (currentState == RatState.Normal)
+            {
+                Tranquilize();
+            }
         }
-
-        // Add points
-        RatHunter.Instance.AddScore(points);
-
-        // Play death animation/effect
-        StartCoroutine(DeathSequence());
+        else if (type == Projectile.ProjectileType.Net)
+        {
+            // 2. Net Hit
+            if (currentState == RatState.Tranquilized)
+            {
+                Capture();
+            }
+            else
+            {
+                
+                Debug.Log("Net shot wasted! Rat was not tranquilized.");
+            }
+        }
     }
 
-    IEnumerator DeathSequence()
+    void Tranquilize()
     {
-        // Simple death effect - scale down and destroy
-        float deathDuration = 0.3f;
+        // Stop any existing tranquilize effect coroutine before starting a new one
+        if (tranquilizedCoroutine != null)
+        {
+            StopCoroutine(tranquilizedCoroutine);
+        }
+        
+        currentState = RatState.Tranquilized;
+        currentMoveSpeed = moveSpeed * tranquilizedSpeedMultiplier;
+        Debug.Log("Rat has been tranquilized! Speed reduced.");
+
+        // Start the countdown to return to normal
+        tranquilizedCoroutine = StartCoroutine(TranquilizerTimer());
+        
+    }
+
+    IEnumerator TranquilizerTimer()
+    {
+        yield return new WaitForSeconds(tranquilizedDuration);
+
+        // Only revert to normal if the rat hasn't been captured
+        if (currentState == RatState.Tranquilized)
+        {
+            Debug.Log("Tranquilizer wore off!");
+            currentState = RatState.Normal;
+            currentMoveSpeed = moveSpeed;
+        }
+    }
+
+    void Capture()
+    {
+            currentState = RatState.Captured;
+            Debug.Log("Rat captured!");
+            // CRITICAL FIX: Tell the RatHunter that the rat was successfully captured
+            if (RatHunter.Instance != null)
+            {
+                RatHunter.Instance.RatCaptured(points);
+            }
+            
+            // Stop all movement
+            if (rb != null)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+
+            // Start capture/death sequence
+            StartCoroutine(CaptureSequence());
+    }    
+    IEnumerator CaptureSequence()
+    {
+        // Simple capture effect (can be replaced with a net animation)
+        float captureDuration = 0.5f;
         float timer = 0f;
         Vector3 originalScale = transform.localScale;
 
-        while (timer < deathDuration)
+        // E.g., shrink and disappear into the ground/net
+        while (timer < captureDuration)
         {
             timer += Time.deltaTime;
-            float progress = timer / deathDuration;
+            float progress = timer / captureDuration;
+            // You might change the sprite/model to a 'captured' state here
             transform.localScale = originalScale * (1f - progress);
             yield return null;
         }
@@ -159,3 +250,4 @@ public class RatController : MonoBehaviour
         Destroy(gameObject);
     }
 }
+
