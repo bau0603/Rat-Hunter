@@ -97,12 +97,15 @@ public class RatController : MonoBehaviour
 
     void ChooseNewDirection()
     {
-        // Random horizontal direction only (no vertical movement)
-        movementDirection = new Vector3(
-            Random.Range(-1f, 1f),
-            0f,
-            Random.Range(-1f, 1f)
-        ).normalized;
+        // Only choose left or right movement
+    float dir = Random.value < 0.5f ? -1f : 1f;
+    movementDirection = new Vector3(dir, 0f, 0f);
+
+    // Flip the rat visually based on direction
+    if (dir > 0)
+    transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);  // face right
+else
+    transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);   // face left
     }
 
     void StayGrounded()
