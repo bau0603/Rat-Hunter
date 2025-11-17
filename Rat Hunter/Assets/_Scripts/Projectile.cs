@@ -10,7 +10,7 @@ public class Projectile : MonoBehaviour
     [Header("Projectile Settings")]
     public ProjectileType type;
     public GameObject hitEffect;
-    public float speed = 25f;       
+    public float speed = 25f;
     public float lifetime = 5f;     // Added to clean up missed shots
     private Vector3 direction;
 
@@ -24,7 +24,7 @@ public class Projectile : MonoBehaviour
     {
         direction = shootDirection.normalized;
         //Align the projectile's forward direction to its movement
-        transform.forward = direction; 
+        transform.forward = direction;
     }
 
     void Update()
@@ -58,7 +58,7 @@ public class Projectile : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        
+
 
         DecoyObject obstacle = other.GetComponent<DecoyObject>();
         if (obstacle != null)
@@ -73,7 +73,7 @@ public class Projectile : MonoBehaviour
             }
             PlayHitEffect();
             // Projectile is destroyed after hitting the obstacle
-            Destroy(gameObject); 
+            Destroy(gameObject);
             return;
         }
 

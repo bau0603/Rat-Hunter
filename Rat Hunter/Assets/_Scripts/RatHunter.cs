@@ -9,13 +9,13 @@ public class RatHunter : MonoBehaviour
 
     [Header("Game Settings")]
     public int startingLives = 3;
-    public float levelDuration = 60f;     
+    public float levelDuration = 60f;
     public int ratsToCapture = 10;
     public LayerMask groundLayer = 1; // Default layer
 
     [Header("Spawn Settings (For Continuous Spawning)")]
     public float spawnInterval = 2f;
-    public int maxRats = 5;     
+    public int maxRats = 5;
 
 
     [Header("UI References")]
@@ -28,8 +28,8 @@ public class RatHunter : MonoBehaviour
     public GameObject ratPrefab;
 
     [Header("Object Prefab")]
-    public GameObject objectPrefab; 
-    
+    public GameObject objectPrefab;
+
     [Range(0f, 1f)]
     public float objectSpawnChance = 0.3f; // 30% chance to spawn Object instead of rat
     public int maxObjectsOnScreen = 3;
@@ -116,7 +116,7 @@ public class RatHunter : MonoBehaviour
         {
             Instantiate(objectPrefab, spawnPosition, Quaternion.identity);
             currentObjectCount++;
-            
+
         }
     }
 
@@ -161,7 +161,7 @@ public class RatHunter : MonoBehaviour
         return Vector3.zero;
     }
 
-    public void RatCaptured(int points) 
+    public void RatCaptured(int points)
     {
         ratsCaptured++;
         score += points;
@@ -221,6 +221,6 @@ public class RatHunter : MonoBehaviour
         if (livesText != null)
             livesText.text = $"Mistakes: {startingLives - lives} / {startingLives}";
         if (timerText != null)
-             timerText.text = $"Time: {Mathf.CeilToInt(currentLevelTime)}s\nCaptured: {ratsCaptured} / {ratsToCapture}";
+            timerText.text = $"Time: {Mathf.CeilToInt(currentLevelTime)}s\nCaptured: {ratsCaptured} / {ratsToCapture}";
     }
 }
