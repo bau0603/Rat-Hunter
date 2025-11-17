@@ -11,11 +11,12 @@ public class RatHunter : MonoBehaviour
     public int startingLives = 3;
     public float levelDuration = 60f;
     public int ratsToCapture = 10;
-    public LayerMask groundLayer = 7;
+    public LayerMask groundLayer = 1; // Default layer
 
     [Header("Spawn Settings (For Continuous Spawning)")]
     public float spawnInterval = 2f;
     public int maxRats = 5;
+
 
     [Header("UI References")]
     public Text scoreText;
@@ -41,7 +42,7 @@ public class RatHunter : MonoBehaviour
     private int currentRatCount = 0;
     private float currentLevelTime;
     private int ratsCaptured = 0;
-    private bool gameEnded = false;
+
 
     void Awake()
     {
@@ -66,7 +67,7 @@ public class RatHunter : MonoBehaviour
 
     void Update()
     {
-        if (gameEnded || Time.timeScale == 0) return;
+        if (Time.timeScale == 0) return;
 
         // Timer System
         currentLevelTime -= Time.deltaTime;
@@ -76,18 +77,18 @@ public class RatHunter : MonoBehaviour
             GameOver();
             return;
         }
-
         // Spawn rats periodically
         spawnTimer += Time.deltaTime;
-        if (spawnTimer >= spawnInterval && (currentRatCount + currentObjectCount) < (maxRats + maxObjectsOnScreen))
+        if (spawnTimer >= spawnInterval && currentRatCount < maxRats)
         {
-            SpawnRatOrObject();
+            SpawnRat();
             spawnTimer = 0f;
         }
         UpdateUI();
     }
 
-    void SpawnRatOrObject()
+
+    void SpawnRat()
     {
         if (Random.value < objectSpawnChance && currentObjectCount < maxObjectsOnScreen)
         {
@@ -96,19 +97,14 @@ public class RatHunter : MonoBehaviour
         }
         else if (currentRatCount < maxRats)
         {
-            SpawnRat();
-        }
-    }
+            if (ratPrefab == null) return;
 
-    void SpawnRat()
-    {
-        if (ratPrefab == null) return;
-
-        Vector3 spawnPosition = GetGroundedSpawnPosition();
-        if (spawnPosition != Vector3.zero) // Only spawn if valid position found
-        {
-            Instantiate(ratPrefab, spawnPosition, Quaternion.identity);
-            currentRatCount++;
+            Vector3 spawnPosition = GetGroundedSpawnPosition();
+            if (spawnPosition != Vector3.zero) // Only spawn if valid position found
+            {
+                Instantiate(ratPrefab, spawnPosition, Quaternion.identity);
+                currentRatCount++;
+            }
         }
     }
 
@@ -120,35 +116,49 @@ public class RatHunter : MonoBehaviour
         {
             Instantiate(objectPrefab, spawnPosition, Quaternion.identity);
             currentObjectCount++;
+
         }
     }
 
     public void ObstacleDestroyed()
     {
         currentObjectCount--;
-        currentObjectCount = Mathf.Max(0, currentObjectCount); // Prevent negative count
     }
 
     Vector3 GetGroundedSpawnPosition()
     {
         Camera cam = Camera.main;
-        if (cam == null) return Vector3.zero;
+        Vector3 spawnPos = Vector3.zero;
 
-        // Get camera position and forward direction
-        Vector3 cameraPos = cam.transform.position;
-        Vector3 cameraForward = cam.transform.forward;
+        // Spawn from random edge of screen
+        int edge = Random.Range(0, 4);
+        float spawnDistance = 10f;
 
-        // Create spawn position in front of camera but on the ground plane
-        Vector3 spawnPos = cameraPos + cameraForward * 20f; // 20 units in front of camera
+        switch (edge)
+        {
+            case 0: // Top
+                spawnPos = cam.ViewportToWorldPoint(new Vector3(Random.Range(0.1f, 0.9f), 1.1f, spawnDistance));
+                break;
+            case 1: // Bottom
+                spawnPos = cam.ViewportToWorldPoint(new Vector3(Random.Range(0.1f, 0.9f), -0.1f, spawnDistance));
+                break;
+            case 2: // Left
+                spawnPos = cam.ViewportToWorldPoint(new Vector3(-0.1f, Random.Range(0.1f, 0.9f), spawnDistance));
+                break;
+            case 3: // Right
+                spawnPos = cam.ViewportToWorldPoint(new Vector3(1.1f, Random.Range(0.1f, 0.9f), spawnDistance));
+                break;
+        }
 
-        // Adjust to be on the ground plane (y = -10 + small offset)
-        spawnPos.y = -9.9f; // Slightly above the ground at y = -10
+        // Find ground level at this position
+        RaycastHit hit;
+        if (Physics.Raycast(spawnPos + Vector3.up * 5f, Vector3.down, out hit, 20f, groundLayer))
+        {
+            return hit.point;
+        }
 
-        // Add random horizontal offset
-        spawnPos.x += Random.Range(-15f, 15f);
-        spawnPos.z += Random.Range(-5f, 5f);
-
-        return spawnPos;
+        // If no ground found, return zero to indicate invalid position
+        return Vector3.zero;
     }
 
     public void RatCaptured(int points)
@@ -156,7 +166,6 @@ public class RatHunter : MonoBehaviour
         ratsCaptured++;
         score += points;
         currentRatCount--; // Rat is removed from the screen
-        currentRatCount = Mathf.Max(0, currentRatCount); // Prevent negative count
 
         // Check for Win Condition
         if (ratsCaptured >= ratsToCapture)
@@ -172,10 +181,9 @@ public class RatHunter : MonoBehaviour
         UpdateUI();
     }
 
-    public void RatEscaped() // New method for when rats escape or are destroyed
+    public void RatSpawned()
     {
-        currentRatCount--;
-        currentRatCount = Mathf.Max(0, currentRatCount);
+        currentRatCount++;
     }
 
     public void LoseLife()
@@ -191,18 +199,13 @@ public class RatHunter : MonoBehaviour
 
     void GameWin()
     {
-        gameEnded = true;
-        if (gameOverText != null)
-        {
-            gameOverText.gameObject.SetActive(true);
-            gameOverText.text = $"LEVEL COMPLETE!\nScore: {score}";
-        }
+        gameOverText.gameObject.SetActive(true);
+        gameOverText.text = $"LEVEL COMPLETE!\nScore: {score}";
         Time.timeScale = 0; // Pause game
     }
 
     void GameOver()
     {
-        gameEnded = true;
         if (gameOverText != null)
         {
             gameOverText.gameObject.SetActive(true);
@@ -216,7 +219,7 @@ public class RatHunter : MonoBehaviour
         if (scoreText != null)
             scoreText.text = $"Score: {score}";
         if (livesText != null)
-            livesText.text = $"Lives: {lives} / {startingLives}";
+            livesText.text = $"Mistakes: {startingLives - lives} / {startingLives}";
         if (timerText != null)
             timerText.text = $"Time: {Mathf.CeilToInt(currentLevelTime)}s\nCaptured: {ratsCaptured} / {ratsToCapture}";
     }

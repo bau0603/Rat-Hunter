@@ -358,6 +358,7 @@
 "Assets/_Scripts/Projectile.cs"
 "Assets/_Scripts/RatController.cs"
 "Assets/_Scripts/RatHunter.cs"
+"Assets/_Scripts/RatSpawner.cs"
 "Assets/_Scripts/ShootingController.cs"
 -langversion:9.0
 /deterministic

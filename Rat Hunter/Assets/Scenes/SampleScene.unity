@@ -310,7 +310,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 190, y: -20}
+  m_AnchoredPosition: {x: 90, y: -20}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &815286701
@@ -461,7 +461,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shotCooldown: 0.5
-  projectileSpeed: 25
+  projectileSpeed: 100
+  projectileLifetime: 2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
   tranquilizerPrefab: {fileID: 5577350477173092037, guid: cefbcc633832649408f33dfc6729c7a2, type: 3}
   netPrefab: {fileID: 469446120439244134, guid: ed9cfec6b0fa26548a1f191dd42e1552, type: 3}
 --- !u!1 &1231592899
@@ -498,7 +502,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 80, y: -20}
+  m_AnchoredPosition: {x: 60, y: -20}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1231592901
@@ -579,7 +583,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -20}
+  m_AnchoredPosition: {x: -30, y: -20}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1497731756
