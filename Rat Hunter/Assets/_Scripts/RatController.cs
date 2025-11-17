@@ -124,12 +124,12 @@ else
         if (mainCamera == null)
         {
             // This attempts to find any active camera tagged "MainCamera"
-            mainCamera = Camera.main; 
-            
+            mainCamera = Camera.main;
+
             if (mainCamera == null)
             {
                 // If still null, we can't do the bounds check, so return early.
-                return; 
+                return;
             }
         }
         Vector3 viewportPos = mainCamera.WorldToViewportPoint(transform.position);
@@ -177,7 +177,7 @@ else
             }
             else
             {
-                
+
                 Debug.Log("Net shot wasted! Rat was not tranquilized.");
             }
         }
@@ -190,14 +190,14 @@ else
         {
             StopCoroutine(tranquilizedCoroutine);
         }
-        
+
         currentState = RatState.Tranquilized;
         currentMoveSpeed = moveSpeed * tranquilizedSpeedMultiplier;
         Debug.Log("Rat has been tranquilized! Speed reduced.");
 
         // Start the countdown to return to normal
         tranquilizedCoroutine = StartCoroutine(TranquilizerTimer());
-        
+
     }
 
     IEnumerator TranquilizerTimer()
@@ -215,24 +215,24 @@ else
 
     void Capture()
     {
-            currentState = RatState.Captured;
-            Debug.Log("Rat captured!");
-            // CRITICAL FIX: Tell the RatHunter that the rat was successfully captured
-            if (RatHunter.Instance != null)
-            {
-                RatHunter.Instance.RatCaptured(points);
-            }
-            
-            // Stop all movement
-            if (rb != null)
-            {
-                rb.velocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-            }
+        currentState = RatState.Captured;
+        Debug.Log("Rat captured!");
+        // CRITICAL FIX: Tell the RatHunter that the rat was successfully captured
+        if (RatHunter.Instance != null)
+        {
+            RatHunter.Instance.RatCaptured(points);
+        }
 
-            // Start capture/death sequence
-            StartCoroutine(CaptureSequence());
-    }    
+        // Stop all movement
+        if (rb != null)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        // Start capture/death sequence
+        StartCoroutine(CaptureSequence());
+    }
     IEnumerator CaptureSequence()
     {
         // Simple capture effect (can be replaced with a net animation)
@@ -253,4 +253,3 @@ else
         Destroy(gameObject);
     }
 }
-
