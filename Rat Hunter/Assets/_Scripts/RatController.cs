@@ -13,11 +13,12 @@ public class RatController : MonoBehaviour
     public float moveSpeed = 3f;
     public float tranquilizedSpeedMultiplier = 0.25f;
     public float directionChangeInterval = 2f;
+    public LayerMask groundLayer = 1; // Default layer
 
     [Header("Tranquilizer Settings")]
-    public float tranquilizedDuration = 3.0f;
+    public float tranquilizedDuration = 3.0f; // How long the tranquilized effect lasts
     private Coroutine tranquilizedCoroutine;
-    private float currentMoveSpeed;
+    private float currentMoveSpeed; // Tracks the current active speed
 
     [Header("Points")]
     public int points = 100;
@@ -26,28 +27,34 @@ public class RatController : MonoBehaviour
     private float directionTimer;
     private Camera mainCamera;
     private Rigidbody rb;
+    private float groundYPosition;
 
     void Awake()
     {
         mainCamera = Camera.main;
         rb = GetComponent<Rigidbody>();
         currentMoveSpeed = moveSpeed;
-
-        if (rb != null)
+        if (mainCamera == null)
         {
-            rb.useGravity = false; // Rats should stay on ground plane
-            rb.constraints = RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezeRotation;
+            Debug.LogError("RatController could not find the Main Camera! Please tag your main camera as 'MainCamera'.");
+            enabled = false; // Disable the script to prevent constant errors
         }
+
+        // Find ground level at spawn position
+        FindGroundLevel();
+        ChooseNewDirection();
     }
 
-    void Start()
+    void FindGroundLevel()
     {
-        ChooseNewDirection();
-
-        // Ensure rat starts on ground plane
-        Vector3 position = transform.position;
-        position.y = -10f; // Slightly above ground at y = -10
-        transform.position = position;
+        // Raycast down to find ground
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position + Vector3.up * 2f, Vector3.down, out hit, 10f, groundLayer))
+        {
+            groundYPosition = hit.point.y;
+            // Position rat on ground
+            transform.position = new Vector3(transform.position.x, groundYPosition, transform.position.z);
+        }
     }
 
     void Update()
@@ -62,57 +69,90 @@ public class RatController : MonoBehaviour
             directionTimer = 0f;
         }
 
-        // Keep rat on ground plane
-        StayOnGround();
+        // Keep rat on screen and grounded
+        KeepInBounds();
+        StayGrounded();
     }
 
     void FixedUpdate()
     {
         if (currentState == RatState.Captured)
         {
-            if (rb != null)
-            {
-                rb.velocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-            }
+            if (rb != null) rb.velocity = Vector3.zero;
             return;
         }
 
-        // Move the rat
-        Vector3 movement = movementDirection * currentMoveSpeed * Time.fixedDeltaTime;
-
+        // Move the rat horizontally while maintaining ground level
+        Vector3 horizontalMovement = new Vector3(movementDirection.x, 0, movementDirection.z) * currentMoveSpeed;
         if (rb != null)
         {
-            rb.MovePosition(transform.position + movement);
+            rb.velocity = new Vector3(horizontalMovement.x, rb.velocity.y, horizontalMovement.z);
         }
         else
         {
-            transform.Translate(movement, Space.World);
-        }
-
-        // Rotate to face movement direction
-        if (movementDirection != Vector3.zero)
-        {
-            transform.rotation = Quaternion.LookRotation(movementDirection);
+            // Fallback to transform movement
+            transform.Translate(horizontalMovement * Time.deltaTime, Space.World);
         }
     }
 
     void ChooseNewDirection()
     {
-        // Random horizontal direction on the ground plane
-        movementDirection = new Vector3(
-            Random.Range(-1f, 1f),
-            0f,
-            Random.Range(-1f, 1f)
-        ).normalized;
+        // Only choose left or right movement
+        float dir = Random.value < 0.5f ? -1f : 1f;
+        movementDirection = new Vector3(dir, 0f, 0f);
+
+        // Flip the rat visually based on direction
+        if (dir > 0)
+            transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);  // face right
+        else
+            transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);   // face left
     }
 
-    void StayOnGround()
+    void StayGrounded()
     {
-        // Keep rat on the ground plane
-        Vector3 position = transform.position;
-        position.y = -9.9f; // Ground plane is at y = -10
-        transform.position = position;
+        // Ensure rat stays on ground level
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, out hit, 2f, groundLayer))
+        {
+            groundYPosition = hit.point.y;
+            transform.position = new Vector3(transform.position.x, groundYPosition, transform.position.z);
+        }
+    }
+
+    void KeepInBounds()
+    {
+        if (mainCamera == null)
+        {
+            // This attempts to find any active camera tagged "MainCamera"
+            mainCamera = Camera.main;
+
+            if (mainCamera == null)
+            {
+                // If still null, we can't do the bounds check, so return early.
+                return;
+            }
+        }
+        Vector3 viewportPos = mainCamera.WorldToViewportPoint(transform.position);
+
+        // Reverse direction if hitting screen edges
+        if (viewportPos.x < 0.1f || viewportPos.x > 0.9f)
+        {
+            movementDirection.x *= -1;
+            // Move slightly away from edge
+            Vector3 newPos = transform.position;
+            newPos.x = Mathf.Clamp(newPos.x, mainCamera.ViewportToWorldPoint(new Vector3(0.1f, 0, viewportPos.z)).x,
+                                                mainCamera.ViewportToWorldPoint(new Vector3(0.9f, 0, viewportPos.z)).x);
+            transform.position = newPos;
+        }
+        if (viewportPos.z < mainCamera.nearClipPlane + 1f || viewportPos.z > mainCamera.farClipPlane - 1f)
+        {
+            movementDirection.z *= -1;
+            // Move slightly away from depth boundaries
+            Vector3 newPos = transform.position;
+            newPos.z = Mathf.Clamp(newPos.z, mainCamera.ViewportToWorldPoint(new Vector3(0, 0, mainCamera.nearClipPlane + 1f)).z,
+                                                mainCamera.ViewportToWorldPoint(new Vector3(0, 0, mainCamera.farClipPlane - 1f)).z);
+            transform.position = newPos;
+        }
     }
 
     // Called when rat is shot
@@ -122,7 +162,7 @@ public class RatController : MonoBehaviour
 
         if (type == Projectile.ProjectileType.Tranquilizer)
         {
-            // Tranquilizer Hit
+            // 1. Tranquilizer Hit
             if (currentState == RatState.Normal)
             {
                 Tranquilize();
@@ -130,13 +170,14 @@ public class RatController : MonoBehaviour
         }
         else if (type == Projectile.ProjectileType.Net)
         {
-            // Net Hit
+            // 2. Net Hit
             if (currentState == RatState.Tranquilized)
             {
                 Capture();
             }
             else
             {
+
                 Debug.Log("Net shot wasted! Rat was not tranquilized.");
             }
         }
@@ -154,11 +195,9 @@ public class RatController : MonoBehaviour
         currentMoveSpeed = moveSpeed * tranquilizedSpeedMultiplier;
         Debug.Log("Rat has been tranquilized! Speed reduced.");
 
-        // Visual feedback - change color to blue
-        GetComponent<Renderer>().material.color = Color.blue;
-
         // Start the countdown to return to normal
         tranquilizedCoroutine = StartCoroutine(TranquilizerTimer());
+
     }
 
     IEnumerator TranquilizerTimer()
@@ -171,9 +210,6 @@ public class RatController : MonoBehaviour
             Debug.Log("Tranquilizer wore off!");
             currentState = RatState.Normal;
             currentMoveSpeed = moveSpeed;
-
-            // Reset color
-            GetComponent<Renderer>().material.color = Color.white;
         }
     }
 
@@ -181,8 +217,7 @@ public class RatController : MonoBehaviour
     {
         currentState = RatState.Captured;
         Debug.Log("Rat captured!");
-
-        // Tell the RatHunter that the rat was successfully captured
+        // CRITICAL FIX: Tell the RatHunter that the rat was successfully captured
         if (RatHunter.Instance != null)
         {
             RatHunter.Instance.RatCaptured(points);
@@ -195,37 +230,26 @@ public class RatController : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
         }
 
-        // Visual feedback - change color to green
-        GetComponent<Renderer>().material.color = Color.green;
-
-        // Start capture sequence
+        // Start capture/death sequence
         StartCoroutine(CaptureSequence());
     }
-
     IEnumerator CaptureSequence()
     {
-        // Simple capture effect
-        float captureDuration = 1.0f;
+        // Simple capture effect (can be replaced with a net animation)
+        float captureDuration = 0.5f;
         float timer = 0f;
         Vector3 originalScale = transform.localScale;
 
+        // E.g., shrink and disappear into the ground/net
         while (timer < captureDuration)
         {
             timer += Time.deltaTime;
             float progress = timer / captureDuration;
+            // You might change the sprite/model to a 'captured' state here
             transform.localScale = originalScale * (1f - progress);
             yield return null;
         }
 
         Destroy(gameObject);
-    }
-
-    void OnDestroy()
-    {
-        // Notify RatHunter if destroyed without being captured (escaped)
-        if (currentState != RatState.Captured && RatHunter.Instance != null)
-        {
-            RatHunter.Instance.RatEscaped();
-        }
     }
 }
