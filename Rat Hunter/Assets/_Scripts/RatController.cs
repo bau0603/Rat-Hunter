@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 public class RatController : MonoBehaviour
 {
@@ -11,55 +10,60 @@ public class RatController : MonoBehaviour
 
     [Header("Movement Settings")]
     public float moveSpeed = 3f;
-    public float tranquilizedSpeedMultiplier = 0.25f;
+    public float tranquilizedSpeed = 1f;
     public float directionChangeInterval = 2f;
-    public LayerMask groundLayer = 1; // Default layer
 
     [Header("Tranquilizer Settings")]
-    public float tranquilizedDuration = 3.0f; // How long the tranquilized effect lasts
+    public float tranquilizedDuration = 3.0f;
     private Coroutine tranquilizedCoroutine;
-    private float currentMoveSpeed; // Tracks the current active speed
+
+    [Header("Effects")]
+    public Material normalMaterial;
+    public Material tranquilizedMaterial;
+    public ParticleSystem captureEffect;
 
     [Header("Points")]
     public int points = 100;
 
-    private Vector3 movementDirection;
+    [HideInInspector] public bool isTranquilized = false;
+
+    private Vector3 moveDirection;
+    private Renderer ratRenderer;
+    private float currentSpeed;
+    private bool isCaptured = false;
     private float directionTimer;
-    private Camera mainCamera;
-    private Rigidbody rb;
-    private float groundYPosition;
+    private Vector3 originalScale;
 
-    void Awake()
+    void Start()
     {
-        mainCamera = Camera.main;
-        rb = GetComponent<Rigidbody>();
-        currentMoveSpeed = moveSpeed;
-        if (mainCamera == null)
-        {
-            Debug.LogError("RatController could not find the Main Camera! Please tag your main camera as 'MainCamera'.");
-            enabled = false; // Disable the script to prevent constant errors
-        }
+        ratRenderer = GetComponent<Renderer>();
+        originalScale = transform.localScale;
+        currentSpeed = moveSpeed;
 
-        // Find ground level at spawn position
-        FindGroundLevel();
-        ChooseNewDirection();
-    }
+        // Randomly choose starting side and direction
+        bool startFromLeft = Random.Range(0, 2) == 0;
+        float startX = startFromLeft ? -15f : 15f;
+        transform.position = new Vector3(startX, -9f, 0f);
 
-    void FindGroundLevel()
-    {
-        // Raycast down to find ground
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position + Vector3.up * 2f, Vector3.down, out hit, 10f, groundLayer))
+        // Random movement direction
+        moveDirection = startFromLeft ? Vector3.right : Vector3.left;
+
+        // Randomize speed slightly
+        currentSpeed *= Random.Range(0.8f, 1.2f);
+
+        // Set initial visual direction
+        UpdateVisualDirection();
+
+        // Apply normal material
+        if (ratRenderer && normalMaterial)
         {
-            groundYPosition = hit.point.y;
-            // Position rat on ground
-            transform.position = new Vector3(transform.position.x, groundYPosition, transform.position.z);
+            ratRenderer.material = normalMaterial;
         }
     }
 
     void Update()
     {
-        if (currentState == RatState.Captured) return;
+        if (isCaptured || currentState == RatState.Captured) return;
 
         // Change direction periodically
         directionTimer += Time.deltaTime;
@@ -69,135 +73,92 @@ public class RatController : MonoBehaviour
             directionTimer = 0f;
         }
 
-        // Keep rat on screen and grounded
-        KeepInBounds();
-        StayGrounded();
+        MoveRat();
+        CheckBounds();
     }
 
-    void FixedUpdate()
+    void MoveRat()
     {
-        if (currentState == RatState.Captured)
-        {
-            if (rb != null) rb.velocity = Vector3.zero;
-            return;
-        }
+        transform.position += moveDirection * currentSpeed * Time.deltaTime;
+    }
 
-        // Move the rat horizontally while maintaining ground level
-        Vector3 horizontalMovement = new Vector3(movementDirection.x, 0, movementDirection.z) * currentMoveSpeed;
-        if (rb != null)
+    void CheckBounds()
+    {
+        // Destroy if moved too far off screen
+        if (Mathf.Abs(transform.position.x) > 20f)
         {
-            rb.velocity = new Vector3(horizontalMovement.x, rb.velocity.y, horizontalMovement.z);
-        }
-        else
-        {
-            // Fallback to transform movement
-            transform.Translate(horizontalMovement * Time.deltaTime, Space.World);
+            Destroy(gameObject);
         }
     }
 
     void ChooseNewDirection()
     {
-        // Only choose left or right movement
-    float dir = Random.value < 0.5f ? -1f : 1f;
-    movementDirection = new Vector3(dir, 0f, 0f);
-
-    // Flip the rat visually based on direction
-    if (dir > 0)
-    transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);  // face right
-else
-    transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);   // face left
+        // Random chance to change direction
+        if (Random.Range(0, 2) == 0) // 50% chance default
+        {
+            moveDirection *= -1;
+            UpdateVisualDirection();
+        }
     }
 
-    void StayGrounded()
+    void UpdateVisualDirection()
     {
-        // Ensure rat stays on ground level
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, out hit, 2f, groundLayer))
+        // Use rotation instead of negative scale for direction changes
+        if (moveDirection.x > 0)
         {
-            groundYPosition = hit.point.y;
-            transform.position = new Vector3(transform.position.x, groundYPosition, transform.position.z);
+            // Moving right - face right (180 degree rotation on Y)
+            transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+        }
+        else if (moveDirection.x < 0)
+        {
+            // Moving left - face left (0 degree rotation on Y)
+            transform.rotation = Quaternion.Euler(0f, 0f, 0f);
         }
     }
 
-    void KeepInBounds()
-    {
-        if (mainCamera == null)
-        {
-            // This attempts to find any active camera tagged "MainCamera"
-            mainCamera = Camera.main;
-
-            if (mainCamera == null)
-            {
-                // If still null, we can't do the bounds check, so return early.
-                return;
-            }
-        }
-        Vector3 viewportPos = mainCamera.WorldToViewportPoint(transform.position);
-
-        // Reverse direction if hitting screen edges
-        if (viewportPos.x < 0.1f || viewportPos.x > 0.9f)
-        {
-            movementDirection.x *= -1;
-            // Move slightly away from edge
-            Vector3 newPos = transform.position;
-            newPos.x = Mathf.Clamp(newPos.x, mainCamera.ViewportToWorldPoint(new Vector3(0.1f, 0, viewportPos.z)).x,
-                                                mainCamera.ViewportToWorldPoint(new Vector3(0.9f, 0, viewportPos.z)).x);
-            transform.position = newPos;
-        }
-        if (viewportPos.z < mainCamera.nearClipPlane + 1f || viewportPos.z > mainCamera.farClipPlane - 1f)
-        {
-            movementDirection.z *= -1;
-            // Move slightly away from depth boundaries
-            Vector3 newPos = transform.position;
-            newPos.z = Mathf.Clamp(newPos.z, mainCamera.ViewportToWorldPoint(new Vector3(0, 0, mainCamera.nearClipPlane + 1f)).z,
-                                                mainCamera.ViewportToWorldPoint(new Vector3(0, 0, mainCamera.farClipPlane - 1f)).z);
-            transform.position = newPos;
-        }
-    }
-
-    // Called when rat is shot
+    // Called when rat is shot by projectile
     public void OnShot(Projectile.ProjectileType type)
     {
-        if (currentState == RatState.Captured) return;
+        if (isCaptured || currentState == RatState.Captured) return;
 
         if (type == Projectile.ProjectileType.Tranquilizer)
         {
-            // 1. Tranquilizer Hit
+            // Tranquilizer Hit
             if (currentState == RatState.Normal)
             {
-                Tranquilize();
+                GetTranquilized();
             }
         }
         else if (type == Projectile.ProjectileType.Net)
         {
-            // 2. Net Hit
+            // Net Hit
             if (currentState == RatState.Tranquilized)
             {
-                Capture();
-            }
-            else
-            {
-
-                Debug.Log("Net shot wasted! Rat was not tranquilized.");
+                GetCaptured();
             }
         }
     }
 
-    void Tranquilize()
+    public void GetTranquilized()
     {
-        // Stop any existing tranquilize effect coroutine before starting a new one
+        if (isTranquilized || isCaptured || currentState != RatState.Normal) return;
+
+        isTranquilized = true;
+        currentState = RatState.Tranquilized;
+        currentSpeed = tranquilizedSpeed;
+
+        // Update material
+        if (ratRenderer && tranquilizedMaterial)
+        {
+            ratRenderer.material = tranquilizedMaterial;
+        }
+
+        // Start tranquilizer timer
         if (tranquilizedCoroutine != null)
         {
             StopCoroutine(tranquilizedCoroutine);
         }
-
-        currentState = RatState.Tranquilized;
-        currentMoveSpeed = moveSpeed * tranquilizedSpeedMultiplier;
-        Debug.Log("Rat has been tranquilized! Speed reduced.");
-
-        // Start the countdown to return to normal
         tranquilizedCoroutine = StartCoroutine(TranquilizerTimer());
-
     }
 
     IEnumerator TranquilizerTimer()
@@ -207,49 +168,95 @@ else
         // Only revert to normal if the rat hasn't been captured
         if (currentState == RatState.Tranquilized)
         {
-            Debug.Log("Tranquilizer wore off!");
             currentState = RatState.Normal;
-            currentMoveSpeed = moveSpeed;
+            isTranquilized = false;
+            currentSpeed = moveSpeed;
+
+            // Revert to normal material
+            if (ratRenderer && normalMaterial)
+            {
+                ratRenderer.material = normalMaterial;
+            }
         }
     }
 
-    void Capture()
+    public void GetCaptured()
     {
+        if (isCaptured || currentState == RatState.Captured) return;
+
+        isCaptured = true;
         currentState = RatState.Captured;
-        Debug.Log("Rat captured!");
-        // CRITICAL FIX: Tell the RatHunter that the rat was successfully captured
+
+        // Stop tranquilizer coroutine if active
+        if (tranquilizedCoroutine != null)
+        {
+            StopCoroutine(tranquilizedCoroutine);
+            tranquilizedCoroutine = null;
+        }
+
+        // Play capture effect
+        if (captureEffect)
+        {
+            Instantiate(captureEffect, transform.position, Quaternion.identity);
+        }
+
+        // Add score
         if (RatHunter.Instance != null)
         {
-            RatHunter.Instance.RatCaptured(points);
+            RatHunter.Instance.AddScore(points);
         }
 
-        // Stop all movement
-        if (rb != null)
-        {
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-        }
-
-        // Start capture/death sequence
+        // Start capture sequence
         StartCoroutine(CaptureSequence());
     }
+
     IEnumerator CaptureSequence()
     {
-        // Simple capture effect (can be replaced with a net animation)
-        float captureDuration = 0.5f;
-        float timer = 0f;
-        Vector3 originalScale = transform.localScale;
+        float captureDuration = 1f;
+        float currentTime = 0f;
 
-        // E.g., shrink and disappear into the ground/net
-        while (timer < captureDuration)
+        // Shrink and fade out
+        while (currentTime < captureDuration)
         {
-            timer += Time.deltaTime;
-            float progress = timer / captureDuration;
-            // You might change the sprite/model to a 'captured' state here
-            transform.localScale = originalScale * (1f - progress);
+            currentTime += Time.deltaTime;
+            float progress = currentTime / captureDuration;
+
+            // Shrink scale
+            transform.localScale = originalScale * (1f - progress * 0.5f);
+
+            // Fade out
+            if (ratRenderer)
+            {
+                Material mat = ratRenderer.material;
+                Color originalColor = mat.color;
+                mat.color = new Color(originalColor.r, originalColor.g, originalColor.b, 1f - progress);
+            }
+
             yield return null;
         }
 
         Destroy(gameObject);
+    }
+
+    // Backwards compatibility with existing Projectile script
+    void OnTriggerEnter(Collider other)
+    {
+        if (isCaptured || currentState == RatState.Captured) return;
+
+        Projectile projectile = other.GetComponent<Projectile>();
+        if (projectile != null)
+        {
+            if (projectile.type == Projectile.ProjectileType.Tranquilizer)
+            {
+                GetTranquilized();
+            }
+            else if (projectile.type == Projectile.ProjectileType.Net && isTranquilized)
+            {
+                GetCaptured();
+            }
+
+            // Destroy the projectile
+            Destroy(other.gameObject);
+        }
     }
 }

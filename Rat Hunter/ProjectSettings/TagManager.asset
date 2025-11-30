@@ -7,7 +7,7 @@ TagManager:
   - Projectile
   - Ground
   - Rat
-  - Obstacle
+  - Decoy
   layers:
   - Default
   - TransparentFX
@@ -17,10 +17,10 @@ TagManager:
   - UI
   - 
   - Ground
-  - Player
+  - Rat
+  - Object
   - Projectile
-  - 
-  - 
+  - Player
   - 
   - 
   - 

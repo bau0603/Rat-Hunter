@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8480207785925141427}
   - component: {fileID: 8444999246365716099}
   - component: {fileID: 4302607959766802330}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Tranquilizer
   m_TagString: Projectile
   m_Icon: {fileID: 0}
@@ -119,7 +119,7 @@ Rigidbody:
   serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -149,6 +149,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
-  hitEffect: {fileID: 7110011605840904674, guid: 16dd1dc813284314795373b692e27030, type: 3}
+  lifeTime: 3
   speed: 25
-  lifetime: 5

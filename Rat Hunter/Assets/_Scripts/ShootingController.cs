@@ -1,9 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
-// Remove this duplicate enum - use the one from Projectile.cs instead
-// public enum ProjectileType { Tranquilizer, Net }
 
 public class ShootingController : MonoBehaviour
 {
@@ -11,20 +6,33 @@ public class ShootingController : MonoBehaviour
     public float shotCooldown = 0.5f;
     public float projectileSpeed = 25f;
     public float projectileLifetime = 2f;
-    public LayerMask groundLayer = 1;
+    public LayerMask groundLayer = 7;
     public GameObject tranquilizerPrefab;
     public GameObject netPrefab;
+    public Transform projectileSpawnPoint;
+
+    [Header("Audio")]
+    public AudioClip tranquilizerSound;
+    public AudioClip netSound;
 
     private Camera mainCamera;
+    private AudioSource audioSource;
     private float lastShotTime;
 
     void Start()
     {
         mainCamera = Camera.main;
+        audioSource = GetComponent<AudioSource>();
+
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main Camera not found! Please tag your camera as 'MainCamera'.");
+        }
     }
 
     void Update()
     {
+        if (!RatHunter.Instance.isGameActive) return;
         if (Time.time < lastShotTime + shotCooldown) return;
 
         if (Input.GetMouseButtonDown(0)) // Left Click - Tranquilizer
@@ -47,37 +55,68 @@ public class ShootingController : MonoBehaviour
             return;
         }
 
-        // Get mouse position on ground
+        // Get mouse position on ground using raycast
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        Vector3 spawnPosition;
+        Vector3 targetPosition;
 
         if (Physics.Raycast(ray, out hit, 100f, groundLayer))
         {
-            spawnPosition = hit.point;
+            targetPosition = hit.point;
         }
         else
         {
-            // Fallback: use point at fixed distance
-            spawnPosition = ray.origin + ray.direction * 10f;
+            // Fallback: use point at fixed distance in front of camera
+            targetPosition = ray.origin + ray.direction * 10f;
         }
 
-        // Create projectile at mouse position but with fixed Z offset for shooting
-        Vector3 projectileSpawnPos = new Vector3(spawnPosition.x, spawnPosition.y, -10f);
-        GameObject projectile = Instantiate(projectilePrefab, projectileSpawnPos, Quaternion.identity);
+        // Determine spawn position - use projectileSpawnPoint if assigned, otherwise use camera position
+        Vector3 spawnPosition = projectileSpawnPoint != null ?
+            projectileSpawnPoint.position :
+            mainCamera.transform.position;
 
-        // Configure projectile using the Projectile script
+        // Create projectile
+        GameObject projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
+
+        // Configure projectile
         Projectile projectileScript = projectile.GetComponent<Projectile>();
         if (projectileScript != null)
         {
+            // Use the new shooting method with target position
             projectileScript.type = type;
+
+            // Calculate direction towards target
+            Vector3 direction = (targetPosition - spawnPosition).normalized;
+            projectileScript.SetDirection(direction);
             projectileScript.speed = projectileSpeed;
-            projectileScript.SetDirection(Vector3.forward);
+
+            // Set lifetime
+            Destroy(projectile, projectileLifetime);
         }
         else
         {
             Debug.LogError("Projectile script missing on prefab!");
             Destroy(projectile, projectileLifetime);
+        }
+
+        // Play sound effect
+        PlayShootSound(type);
+    }
+
+    void PlayShootSound(Projectile.ProjectileType type)
+    {
+        if (audioSource == null) return;
+
+        switch (type)
+        {
+            case Projectile.ProjectileType.Tranquilizer:
+                if (tranquilizerSound != null)
+                    audioSource.PlayOneShot(tranquilizerSound);
+                break;
+            case Projectile.ProjectileType.Net:
+                if (netSound != null)
+                    audioSource.PlayOneShot(netSound);
+                break;
         }
     }
 }

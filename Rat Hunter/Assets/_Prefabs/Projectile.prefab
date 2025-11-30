@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5405149721046734594}
   - component: {fileID: 2623460332215115017}
   - component: {fileID: 2036942815521938175}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Projectile
   m_TagString: Projectile
   m_Icon: {fileID: 0}
@@ -149,6 +149,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 1
-  hitEffect: {fileID: 0}
-  speed: 25
-  lifetime: 5
+  lifeTime: 3

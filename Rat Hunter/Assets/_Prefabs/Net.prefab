@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: -6940670500200482398}
   - component: {fileID: 4069818733383670643}
   - component: {fileID: -1338492757521688772}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Net
   m_TagString: Projectile
   m_Icon: {fileID: 0}
@@ -99,9 +99,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 1
-  hitEffect: {fileID: 0}
-  speed: 25
-  lifetime: 5
+  lifeTime: 3
 --- !u!1 &2700925342872618852
 GameObject:
   m_ObjectHideFlags: 0
@@ -114,7 +112,7 @@ GameObject:
   - component: {fileID: 308624335266020664}
   - component: {fileID: 4320881452671761033}
   - component: {fileID: 17152094493747519}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -219,7 +217,7 @@ GameObject:
   - component: {fileID: 1540992262680683075}
   - component: {fileID: 3597120562889144168}
   - component: {fileID: 8431509641240653441}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -324,7 +322,7 @@ GameObject:
   - component: {fileID: 779634131728001387}
   - component: {fileID: 3379915794039156702}
   - component: {fileID: 6211270645115803554}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -429,7 +427,7 @@ GameObject:
   - component: {fileID: 4232202314137424056}
   - component: {fileID: 581377018553574231}
   - component: {fileID: 812218313334206208}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
