@@ -3,7 +3,7 @@ using System.Collections;
 
 public class RatController : MonoBehaviour
 {
-    public enum RatState { Normal, Tranquilized, Captured }
+    public enum RatState { Normal, Tranquilized, Captured, Kingy, Speedy, Jumpy, Tanky }
 
     [Header("Rat State")]
     public RatState currentState = RatState.Normal;
