@@ -151,8 +151,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b649e77c36803a44aba2ecf89ffd906e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameTime: 60
-  targetRats: 10
+  gameTime: 120
+  targetRats: 40
   playerLives: 3
   timerText: {fileID: 1231592901}
   scoreText: {fileID: 815286701}
@@ -743,7 +743,7 @@ MonoBehaviour:
   projectileLifetime: 2
   groundLayer:
     serializedVersion: 2
-    m_Bits: 7
+    m_Bits: 128
   tranquilizerPrefab: {fileID: 5577350477173092037, guid: cefbcc633832649408f33dfc6729c7a2, type: 3}
   netPrefab: {fileID: 469446120439244134, guid: ed9cfec6b0fa26548a1f191dd42e1552, type: 3}
   projectileSpawnPoint: {fileID: 963194228}
