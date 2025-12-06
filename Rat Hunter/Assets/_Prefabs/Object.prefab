@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7946492650368485210}
   - component: {fileID: 6388874358065042300}
   - component: {fileID: 5900594865481699125}
+  - component: {fileID: 5602385889294514859}
   m_Layer: 9
   m_Name: Object
   m_TagString: Decoy
@@ -105,3 +106,27 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5602385889294514859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6407256123511333759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59dac3587b157da49a5231eb87e91459, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  decoyPrefabs:
+  - {fileID: 6407256123511333759}
+  minSpawnTime: 5
+  maxSpawnTime: 5
+  maxDecoys: 3
+  minX: -10
+  maxX: 10
+  yPosition: -9
+  lifeTime: 3
+  scorePenalty: 1
+  minMoveSpeed: 2
+  maxMoveSpeed: 4

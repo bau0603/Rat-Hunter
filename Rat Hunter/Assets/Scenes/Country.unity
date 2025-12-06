@@ -431,10 +431,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d24f103af0dd08244892a85ada1480eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ratPrefab: {fileID: 5681190576489505949, guid: dde3cfa151d0056458337334a2a433eb, type: 3}
-  minSpawnTime: 7
-  maxSpawnTime: 7
-  maxRats: 7
+  ratPrefabs:
+  - {fileID: 5681190576489505949, guid: dde3cfa151d0056458337334a2a433eb, type: 3}
+  - {fileID: 5681190576489505949, guid: 4f45939347481784ab648ff37046f3d0, type: 3}
+  minSpawnTime: 2
+  maxSpawnTime: 2
+  maxRats: 10
+  speedyRatChance: 0.275
 --- !u!4 &380572822
 Transform:
   m_ObjectHideFlags: 0
@@ -517,7 +520,7 @@ GameObject:
   - component: {fileID: 1051220548}
   - component: {fileID: 1051220547}
   m_Layer: 0
-  m_Name: DecoyObject
+  m_Name: Apple
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -535,15 +538,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59dac3587b157da49a5231eb87e91459, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  decoyPrefabs: []
+  decoyPrefabs:
+  - {fileID: 6407256123511333759, guid: 7d7554a2c3afaca47a829097cdf02f79, type: 3}
   minSpawnTime: 2
   maxSpawnTime: 5
   maxDecoys: 3
   minX: -10
   maxX: 10
-  yPosition: 0
+  yPosition: -9
   lifeTime: 10
   scorePenalty: 1
+  minMoveSpeed: 2
+  maxMoveSpeed: 4
 --- !u!4 &1051220548
 Transform:
   m_ObjectHideFlags: 0
@@ -553,7 +559,7 @@ Transform:
   m_GameObject: {fileID: 1051220546}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.5413531, y: -1.7640755, z: -10.062901}
+  m_LocalPosition: {x: -0.5413531, y: 2.721099, z: -10.062901}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -620,7 +626,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3eb5d4ea6198e42478eac21451672089, type: 2}
+  - {fileID: 2100000, guid: 7c49e774b4c2a8c43bd8bc74172f4b39, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1247,9 +1253,9 @@ SceneRoots:
   m_Roots:
   - {fileID: 1864062253}
   - {fileID: 33487416}
-  - {fileID: 1591314567}
-  - {fileID: 1051220548}
-  - {fileID: 380572822}
-  - {fileID: 162467691}
-  - {fileID: 436458831}
   - {fileID: 1706003222}
+  - {fileID: 436458831}
+  - {fileID: 162467691}
+  - {fileID: 380572822}
+  - {fileID: 1051220548}
+  - {fileID: 1591314567}
