@@ -96,6 +96,7 @@ public class RatHunter : MonoBehaviour
         gameOverPanel.SetActive(true);
         gameOverText.text = won ? "You Win!" : "Game Over!";
         gameOverText.color = won ? Color.green : Color.red;
+        RestartGame();
     }
 
     public void RestartGame()
