@@ -422,7 +422,7 @@ MonoBehaviour:
   currentState: 4
   moveSpeed: 8
   tranquilizedSpeed: 3
-  directionChangeInterval: 0.5
+  directionChangeInterval: 1
   tranquilizedDuration: 5
   normalMaterial: {fileID: 2100000, guid: 5280b0cfafac2b340a8a925add4c4204, type: 2}
   tranquilizedMaterial: {fileID: 0}

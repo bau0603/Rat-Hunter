@@ -238,24 +238,35 @@ public class RatController : MonoBehaviour
     }
 
     // Backwards compatibility with existing Projectile script
-    void OnTriggerEnter(Collider other)
-    {
-        if (isCaptured || currentState == RatState.Captured) return;
+   void OnTriggerEnter(Collider other)
+{
+    if (isCaptured || currentState == RatState.Captured) return;
 
-        Projectile projectile = other.GetComponent<Projectile>();
-        if (projectile != null)
+    Projectile projectile = other.GetComponent<Projectile>();
+    if (projectile != null)
+    {
+        if (projectile.type == Projectile.ProjectileType.Tranquilizer)
         {
-            if (projectile.type == Projectile.ProjectileType.Tranquilizer)
+            
+            if (currentState == RatState.Normal)
             {
                 GetTranquilized();
             }
-            else if (projectile.type == Projectile.ProjectileType.Net && isTranquilized)
+            
+            else if (currentState == RatState.Tranquilized)
             {
-                GetCaptured();
+                GetCaptured();   
             }
-
-            // Destroy the projectile
-            Destroy(other.gameObject);
         }
+        else if (projectile.type == Projectile.ProjectileType.Net)
+        {
+            
+            GetCaptured();
+        }
+
+        
+        Destroy(other.gameObject);
     }
+}
+
 }
