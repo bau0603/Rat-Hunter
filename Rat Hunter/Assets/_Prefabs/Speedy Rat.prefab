@@ -332,7 +332,7 @@ GameObject:
   - component: {fileID: -3789963011428242122}
   - component: {fileID: 2724803102466090038}
   m_Layer: 8
-  m_Name: Base Rat
+  m_Name: Speedy Rat
   m_TagString: Rat
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -419,7 +419,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e2b45ef13d670a44afa028c740fc0fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: 0
+  currentState: 4
   moveSpeed: 5
   tranquilizedSpeed: 1
   directionChangeInterval: 0.5

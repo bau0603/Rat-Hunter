@@ -1,10 +1,9 @@
 fileFormatVersion: 2
-guid: d24f103af0dd08244892a85ada1480eb
+guid: 71aefd72795b05b4ca47596296c97ec4
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences:
-  - ratPrefab: {fileID: 5681190576489505949, guid: dde3cfa151d0056458337334a2a433eb, type: 3}
+  defaultReferences: []
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

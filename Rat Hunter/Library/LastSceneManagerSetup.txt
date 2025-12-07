@@ -1,5 +1,9 @@
 sceneSetups:
+<<<<<<< HEAD
 - path: Assets/Scenes/StartMenu.unity
+=======
+- path: Assets/Scenes/Country.unity
+>>>>>>> k's-new-changes
   isLoaded: 1
   isActive: 1
   isSubScene: 0
