@@ -32,8 +32,8 @@ public class StartMenu : MonoBehaviour
 
     void StartGame()
     {
-        // Load the game scene (Sewerline for now)
-        SceneManager.LoadScene("Sewerline");
+        // Load the game scene (Level 1)
+        SceneManager.LoadScene("Level 1");
     }
 
     void SelectLevel()

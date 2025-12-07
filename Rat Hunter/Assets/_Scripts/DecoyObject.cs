@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Collections;
 using Random = UnityEngine.Random;
 
-// This is the main component responsible for spawning and managing decoys.
 public class DecoyObject : MonoBehaviour
 {
     [Header("Spawning Settings")]
@@ -63,7 +62,6 @@ public class DecoyObject : MonoBehaviour
     {
         while (true)
         {
-            // Assuming RatHunter.Instance and isGameActive are defined elsewhere and accessible.
             if (currentDecoys < maxDecoys && decoyPrefabs != null && decoyPrefabs.Length > 0 &&
                 RatHunter.Instance != null && RatHunter.Instance.isGameActive)
             {

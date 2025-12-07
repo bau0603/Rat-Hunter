@@ -76,10 +76,9 @@ public class Projectile : MonoBehaviour
                 else if (type == ProjectileType.Net && rat.isTranquilized)
                 {
                     rat.GetCaptured();
-                    RatHunter.Instance.AddScore(100);
                     print("Rat captured!");
                 }
-                else if(type == ProjectileType.Net && !rat.isTranquilized)
+                else if (type == ProjectileType.Net && !rat.isTranquilized)
                 {
                     print("Net hit a non-tranquilized rat. No effect.");
                 }
@@ -92,7 +91,6 @@ public class Projectile : MonoBehaviour
             if (decoy != null)
             {
                 decoy.HitByProjectile();
-                RatHunter.Instance.LoseLife();
                 print("Decoy hit! Life lost.");
             }
             DestroyProjectile();
