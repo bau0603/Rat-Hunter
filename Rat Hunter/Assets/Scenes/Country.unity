@@ -420,16 +420,16 @@ MonoBehaviour:
   gameTime: 60
   targetRats: 15
   playerLives: 3
-  timerText: {fileID: 0}
-  scoreText: {fileID: 0}
-  livesText: {fileID: 0}
-  ratsCapturedText: {fileID: 0}
-  gameOverMenu: {fileID: 0}
-  gameOverPanel: {fileID: 0}
-  gameOverText: {fileID: 0}
-  restartButton: {fileID: 0}
-  continueButton: {fileID: 0}
-  menuButton: {fileID: 0}
+  timerText: {fileID: 481494039}
+  scoreText: {fileID: 569573412}
+  livesText: {fileID: 1679318682}
+  ratsCapturedText: {fileID: 1455150167}
+  gameOverMenu: {fileID: 588039253}
+  gameOverPanel: {fileID: 1682145811}
+  gameOverText: {fileID: 1564663825}
+  restartButton: {fileID: 1857257001}
+  continueButton: {fileID: 91824979}
+  menuButton: {fileID: 653519209}
   currentScore: 0
   ratsCaptured: 0
   isGameActive: 1
@@ -915,7 +915,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 1864062252}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -1840,8 +1840,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 1864062253}
   - {fileID: 33487416}
+  - {fileID: 987420996}
   - {fileID: 1706003222}
   - {fileID: 436458831}
   - {fileID: 380572822}
   - {fileID: 1591314567}
-  - {fileID: 987420996}

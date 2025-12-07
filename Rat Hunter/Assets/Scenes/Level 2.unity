@@ -508,16 +508,16 @@ MonoBehaviour:
   gameTime: 30
   targetRats: 40
   playerLives: 3
-  timerText: {fileID: 0}
-  scoreText: {fileID: 0}
-  livesText: {fileID: 0}
-  ratsCapturedText: {fileID: 0}
-  gameOverMenu: {fileID: 0}
-  gameOverPanel: {fileID: 0}
-  gameOverText: {fileID: 0}
-  restartButton: {fileID: 0}
-  continueButton: {fileID: 0}
-  menuButton: {fileID: 0}
+  timerText: {fileID: 2097670957}
+  scoreText: {fileID: 65431286}
+  livesText: {fileID: 1542789157}
+  ratsCapturedText: {fileID: 130492012}
+  gameOverMenu: {fileID: 553588359}
+  gameOverPanel: {fileID: 51685378}
+  gameOverText: {fileID: 1518602192}
+  restartButton: {fileID: 134607691}
+  continueButton: {fileID: 1152748571}
+  menuButton: {fileID: 1852241397}
   currentScore: 0
   ratsCaptured: 0
   isGameActive: 1
