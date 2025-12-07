@@ -6,10 +6,12 @@ public class ShootingController : MonoBehaviour
     public float shotCooldown = 0.5f;
     public float projectileSpeed = 25f;
     public float projectileLifetime = 2f;
-    public LayerMask groundLayer = 7;
     public GameObject tranquilizerPrefab;
     public GameObject netPrefab;
-    public Transform projectileSpawnPoint;
+
+    [Header("2D Shooting Settings")]
+    public float shootingPlaneZ = 10f; // Z position where projectiles exist (where rats are)
+    public float projectileSpawnZ = -5f; // Z position where projectiles spawn (in front of camera)
 
     [Header("Audio")]
     public AudioClip tranquilizerSound;
@@ -32,22 +34,22 @@ public class ShootingController : MonoBehaviour
 
     void Update()
     {
-        if (!RatHunter.Instance.isGameActive) return;
+        if (RatHunter.Instance == null || !RatHunter.Instance.isGameActive) return;
         if (Time.time < lastShotTime + shotCooldown) return;
 
         if (Input.GetMouseButtonDown(0)) // Left Click - Tranquilizer
         {
-            Shoot(tranquilizerPrefab, Projectile.ProjectileType.Tranquilizer);
+            ShootProjectile(tranquilizerPrefab, Projectile.ProjectileType.Tranquilizer);
             lastShotTime = Time.time;
         }
         else if (Input.GetMouseButtonDown(1)) // Right Click - Net
         {
-            Shoot(netPrefab, Projectile.ProjectileType.Net);
+            ShootProjectile(netPrefab, Projectile.ProjectileType.Net);
             lastShotTime = Time.time;
         }
     }
 
-    void Shoot(GameObject projectilePrefab, Projectile.ProjectileType type)
+    void ShootProjectile(GameObject projectilePrefab, Projectile.ProjectileType type)
     {
         if (projectilePrefab == null)
         {
@@ -55,25 +57,17 @@ public class ShootingController : MonoBehaviour
             return;
         }
 
-        // Get mouse position on ground using raycast
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        Vector3 targetPosition;
+        // Get mouse position in screen coordinates
+        Vector3 mouseScreenPosition = Input.mousePosition;
 
-        if (Physics.Raycast(ray, out hit, 100f, groundLayer))
-        {
-            targetPosition = hit.point;
-        }
-        else
-        {
-            // Fallback: use point at fixed distance in front of camera
-            targetPosition = ray.origin + ray.direction * 10f;
-        }
+        // Convert mouse position to world position on the shooting plane (where rats are)
+        Vector3 targetWorldPosition = GetWorldPositionOnShootingPlane(mouseScreenPosition);
 
-        // Determine spawn position - use projectileSpawnPoint if assigned, otherwise use camera position
-        Vector3 spawnPosition = projectileSpawnPoint != null ?
-            projectileSpawnPoint.position :
-            mainCamera.transform.position;
+        // Determine spawn position (in front of camera, on spawn plane)
+        Vector3 spawnPosition = GetProjectileSpawnPosition(mouseScreenPosition);
+
+        // Calculate direction from spawn position to target position
+        Vector3 shootDirection = (targetWorldPosition - spawnPosition).normalized;
 
         // Create projectile
         GameObject projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
@@ -82,12 +76,8 @@ public class ShootingController : MonoBehaviour
         Projectile projectileScript = projectile.GetComponent<Projectile>();
         if (projectileScript != null)
         {
-            // Use the new shooting method with target position
             projectileScript.type = type;
-
-            // Calculate direction towards target
-            Vector3 direction = (targetPosition - spawnPosition).normalized;
-            projectileScript.SetDirection(direction);
+            projectileScript.SetDirection(shootDirection);
             projectileScript.speed = projectileSpeed;
 
             // Set lifetime
@@ -101,6 +91,30 @@ public class ShootingController : MonoBehaviour
 
         // Play sound effect
         PlayShootSound(type);
+    }
+
+    Vector3 GetWorldPositionOnShootingPlane(Vector3 mouseScreenPosition)
+    {
+        // Create a plane at Z = shootingPlaneZ where the rats exist
+        // This simulates shooting at objects in the 2D plane
+        mouseScreenPosition.z = shootingPlaneZ - mainCamera.transform.position.z;
+
+        // Convert screen position to world position
+        Vector3 worldPosition = mainCamera.ScreenToWorldPoint(mouseScreenPosition);
+
+        return worldPosition;
+    }
+
+    Vector3 GetProjectileSpawnPosition(Vector3 mouseScreenPosition)
+    {
+        // Spawn projectiles slightly in front of the camera on the spawn plane
+        // This creates a "shooting from camera" effect
+        mouseScreenPosition.z = projectileSpawnZ - mainCamera.transform.position.z;
+
+        // Convert screen position to world position on spawn plane
+        Vector3 spawnPosition = mainCamera.ScreenToWorldPoint(mouseScreenPosition);
+
+        return spawnPosition;
     }
 
     void PlayShootSound(Projectile.ProjectileType type)

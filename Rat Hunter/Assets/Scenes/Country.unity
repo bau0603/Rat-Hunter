@@ -1750,14 +1750,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shotCooldown: 0.5
-  projectileSpeed: 100
-  projectileLifetime: 2
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 128
+  projectileSpeed: 75
+  projectileLifetime: 5
   tranquilizerPrefab: {fileID: 5577350477173092037, guid: cefbcc633832649408f33dfc6729c7a2, type: 3}
   netPrefab: {fileID: 469446120439244134, guid: ed9cfec6b0fa26548a1f191dd42e1552, type: 3}
-  projectileSpawnPoint: {fileID: 1864062253}
+  shootingPlaneZ: -5
+  projectileSpawnZ: -15
   tranquilizerSound: {fileID: 0}
   netSound: {fileID: 0}
 --- !u!81 &1864062251

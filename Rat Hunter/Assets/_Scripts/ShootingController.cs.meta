@@ -3,7 +3,11 @@ guid: bafa82bde6a512b40ab5207cdf8a360e
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - tranquilizerPrefab: {fileID: 5577350477173092037, guid: cefbcc633832649408f33dfc6729c7a2, type: 3}
+  - netPrefab: {fileID: 469446120439244134, guid: ed9cfec6b0fa26548a1f191dd42e1552, type: 3}
+  - tranquilizerSound: {fileID: 8300000, guid: e30d2d11f94c90940bd2d923def6c0ce, type: 3}
+  - netSound: {fileID: 8300000, guid: 22c9375230baf664c9484daeb14cad4a, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
