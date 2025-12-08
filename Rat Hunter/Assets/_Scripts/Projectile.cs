@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 
 public class Projectile : MonoBehaviour
 {
@@ -9,79 +6,101 @@ public class Projectile : MonoBehaviour
 
     [Header("Projectile Settings")]
     public ProjectileType type;
-    public GameObject hitEffect;
-    public float speed = 25f;       
-    public float lifetime = 5f;     // Added to clean up missed shots
-    private Vector3 direction;
+    public float lifeTime = 3f;
+    public float speed = 25f; // Made public instead of private
 
-    void Start()
+    private Vector3 targetPosition;
+    private Vector3 moveDirection; // Added moveDirection variable
+    private bool hasHit = false;
+
+    // Old initialization method (for backwards compatibility)
+    public void Initialize(Vector3 targetPos, float projectileSpeed, ProjectileType projectileType)
     {
-        // Projectile is destroyed automatically after 'lifetime' seconds if it misses.
-        Destroy(gameObject, lifetime);
+        targetPosition = targetPos;
+        speed = projectileSpeed;
+        type = projectileType;
+        Destroy(gameObject, lifeTime);
     }
 
-    public void SetDirection(Vector3 shootDirection)
+    // New method for direction-based movement
+    public void SetDirection(Vector3 direction)
     {
-        direction = shootDirection.normalized;
-        //Align the projectile's forward direction to its movement
-        transform.forward = direction; 
+        moveDirection = direction.normalized;
+        Destroy(gameObject, lifeTime);
     }
 
     void Update()
     {
-        //Simple Movement Logic
-        transform.position += direction * speed * Time.deltaTime;
+        if (hasHit) return;
+
+        // Use direction-based movement if moveDirection is set, otherwise use target-based
+        if (moveDirection != Vector3.zero)
+        {
+            // Direction-based movement (new system)
+            transform.position += moveDirection * speed * Time.deltaTime;
+
+            // Rotate towards movement direction
+            if (moveDirection != Vector3.zero)
+            {
+                transform.rotation = Quaternion.LookRotation(moveDirection);
+            }
+        }
+        else
+        {
+            // Target-based movement (old system - for backwards compatibility)
+            Vector3 direction = (targetPosition - transform.position).normalized;
+            transform.position += direction * speed * Time.deltaTime;
+
+            // Rotate towards movement direction
+            if (direction != Vector3.zero)
+            {
+                transform.rotation = Quaternion.LookRotation(direction);
+            }
+        }
     }
 
     void OnTriggerEnter(Collider other)
     {
-        void PlayHitEffect()
+        if (hasHit) return;
+
+        if (other.CompareTag("Rat"))
         {
-            if (hitEffect != null)
+            RatController rat = other.GetComponent<RatController>();
+            if (rat != null)
             {
-                Instantiate(hitEffect, transform.position, transform.rotation);
+                if (type == ProjectileType.Tranquilizer)
+                {
+                    rat.GetTranquilized();
+                    print("Rat tranquilized!");
+                }
+                else if (type == ProjectileType.Net && rat.isTranquilized)
+                {
+                    rat.GetCaptured();
+                    print("Rat captured!");
+                }
+                else if (type == ProjectileType.Net && !rat.isTranquilized)
+                {
+                    print("Net hit a non-tranquilized rat. No effect.");
+                }
             }
+            DestroyProjectile();
         }
-
-        // Check if we hit a rat
-        RatController rat = other.GetComponent<RatController>();
-        if (rat != null)
+        else if (other.CompareTag("Decoy"))
         {
-            rat.OnShot(type);
-
-            // Instantiate hit effect if assigned
-            if (hitEffect != null)
+            DecoyInstance decoy = other.GetComponent<DecoyInstance>();
+            if (decoy != null)
             {
-                Instantiate(hitEffect, transform.position, transform.rotation);
+                decoy.HitByProjectile();
+                print("Decoy hit! Life lost.");
             }
-
-            Destroy(gameObject);
-            return;
+            DestroyProjectile();
         }
-        
+    }
 
-        DecoyObject obstacle = other.GetComponent<DecoyObject>();
-        if (obstacle != null)
-        {
-            //Tell the Obstacle it was hit 
-            obstacle.OnHit();
-
-            //Tell the Game Manager a penalty was registered
-            if (RatHunter.Instance != null)
-            {
-                RatHunter.Instance.LoseLife(); //This checks if lives (penalties left) <= 0
-            }
-            PlayHitEffect();
-            // Projectile is destroyed after hitting the obstacle
-            Destroy(gameObject); 
-            return;
-        }
-
-        // Destroy projectile when hitting ground or any object (except shooter)
-        else if (!other.CompareTag("Player") && !other.CompareTag("Projectile"))
-        {
-            PlayHitEffect(); // FIX: Now using the local function
-            Destroy(gameObject);
-        }
+    void DestroyProjectile()
+    {
+        hasHit = true;
+        // Add any destruction effects here
+        Destroy(gameObject);
     }
 }

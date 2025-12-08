@@ -1,98 +1,122 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public enum ProjectileType {Tranquilizer, Net}
 public class ShootingController : MonoBehaviour
 {
     [Header("Shooting Settings")]
     public float shotCooldown = 0.5f;
-    //public float projectileSpeed = 100f;
-    //public float projectileLifetime = 2f;
-   // public GameObject projectilePrefab;
-    public LayerMask groundLayer = 1;
+    public float projectileSpeed = 25f;
+    public float projectileLifetime = 2f;
+    public LayerMask groundLayer = 7;
     public GameObject tranquilizerPrefab;
     public GameObject netPrefab;
+    public Transform projectileSpawnPoint;
+
+    [Header("Audio")]
+    public AudioClip tranquilizerSound;
+    public AudioClip netSound;
 
     private Camera mainCamera;
+    private AudioSource audioSource;
     private float lastShotTime;
 
     void Start()
     {
         mainCamera = Camera.main;
+        audioSource = GetComponent<AudioSource>();
+
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main Camera not found! Please tag your camera as 'MainCamera'.");
+        }
     }
 
     void Update()
     {
-        if(Time.time < lastShotTime + shotCooldown) return;
+        if (!RatHunter.Instance.isGameActive) return;
+        if (Time.time < lastShotTime + shotCooldown) return;
 
-        if (Input.GetMouseButtonDown(0)) //Left Click
+        if (Input.GetMouseButtonDown(0)) // Left Click - Tranquilizer
         {
-            Shoot(tranquilizerPrefab, ProjectileType.Tranquilizer);
+            Shoot(tranquilizerPrefab, Projectile.ProjectileType.Tranquilizer);
             lastShotTime = Time.time;
         }
-        else if (Input.GetMouseButtonDown(1)) //Right Click
+        else if (Input.GetMouseButtonDown(1)) // Right Click - Net
         {
-            Shoot(netPrefab, ProjectileType.Net);
+            Shoot(netPrefab, Projectile.ProjectileType.Net);
             lastShotTime = Time.time;
         }
     }
 
-    void Shoot(GameObject prefab, ProjectileType type)
+    void Shoot(GameObject projectilePrefab, Projectile.ProjectileType type)
     {
-        print("Bang!");
-
-        if (prefab == null)
+        if (projectilePrefab == null)
         {
-            Debug.LogError("Projectile prefab not assigned!");
+            Debug.LogError("Projectile prefab is not assigned!");
             return;
         }
 
-        // Get mouse position on ground
+        // Get mouse position on ground using raycast
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        Vector3 spawnPosition;
+        Vector3 targetPosition;
 
         if (Physics.Raycast(ray, out hit, 100f, groundLayer))
         {
-            spawnPosition = hit.point;
+            targetPosition = hit.point;
         }
         else
         {
-            // Fallback: use point at fixed distance
-            spawnPosition = ray.origin + ray.direction * 10f;
+            // Fallback: use point at fixed distance in front of camera
+            targetPosition = ray.origin + ray.direction * 10f;
         }
 
-        // Create projectile at mouse position but with fixed Z offset for shooting
-        // Adjust the Z value based on your scene setup
-        Vector3 projectileSpawnPos = transform.position;
-        GameObject projectileGO = Instantiate(prefab, projectileSpawnPos, Quaternion.identity);
-        Vector3 shootDirection = ( spawnPosition - projectileSpawnPos).normalized;
+        // Determine spawn position - use projectileSpawnPoint if assigned, otherwise use camera position
+        Vector3 spawnPosition = projectileSpawnPoint != null ?
+            projectileSpawnPoint.position :
+            mainCamera.transform.position;
 
-        // Set Projectile type
-        Projectile projectileScript = projectileGO.GetComponent<Projectile>();
+        // Create projectile
+        GameObject projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
+
+        // Configure projectile
+        Projectile projectileScript = projectile.GetComponent<Projectile>();
         if (projectileScript != null)
         {
-            projectileScript.SetDirection(shootDirection);
-        }
-        
-        /*Projectile projectileScript = projectileGO.GetComponent<Projectile>();
-        // Shoot straight along Z-axis
-        Vector3 shootDirection = Vector3.forward; // Or Vector3.back depending on your scene orientation
+            // Use the new shooting method with target position
+            projectileScript.type = type;
 
-        Rigidbody rb = projectile.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.velocity = shootDirection * projectileSpeed;
+            // Calculate direction towards target
+            Vector3 direction = (targetPosition - spawnPosition).normalized;
+            projectileScript.SetDirection(direction);
+            projectileScript.speed = projectileSpeed;
+
+            // Set lifetime
+            Destroy(projectile, projectileLifetime);
         }
         else
         {
-            rb = projectile.AddComponent<Rigidbody>();
-            rb.velocity = shootDirection * projectileSpeed;
-        }*/
-        else
+            Debug.LogError("Projectile script missing on prefab!");
+            Destroy(projectile, projectileLifetime);
+        }
+
+        // Play sound effect
+        PlayShootSound(type);
+    }
+
+    void PlayShootSound(Projectile.ProjectileType type)
+    {
+        if (audioSource == null) return;
+
+        switch (type)
         {
-            Debug.LogError("Instantiated prefab is missing the Projectile script!");
+            case Projectile.ProjectileType.Tranquilizer:
+                if (tranquilizerSound != null)
+                    audioSource.PlayOneShot(tranquilizerSound);
+                break;
+            case Projectile.ProjectileType.Net:
+                if (netSound != null)
+                    audioSource.PlayOneShot(netSound);
+                break;
         }
     }
 }
