@@ -9,7 +9,7 @@ public class StartMenu : MonoBehaviour
     [Header("Menu Options")]
     public Button startButton;
     public Button selectButton;
-    public Button endlessButton;
+    public Button creditButton;
 
     [Header("Menu Visuals")]
     public GameObject ratIconF;
@@ -27,7 +27,7 @@ public class StartMenu : MonoBehaviour
         // Add listener to the button click event
         startButton.onClick.AddListener(StartGame);
         selectButton.onClick.AddListener(SelectLevel);
-        endlessButton.onClick.AddListener(EndlessMode);
+        creditButton.onClick.AddListener(EndlessMode);
     }
 
     void StartGame()
@@ -43,6 +43,6 @@ public class StartMenu : MonoBehaviour
 
     void EndlessMode()
     {
-        print("Coming Soon!");
+        SceneManager.LoadScene("Credits");
     }
 }

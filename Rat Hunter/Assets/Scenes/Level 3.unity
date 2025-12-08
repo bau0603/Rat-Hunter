@@ -207,8 +207,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b649e77c36803a44aba2ecf89ffd906e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameTime: 60
-  targetRats: 30
+  gameTime: 120
+  targetRats: 25
   playerLives: 3
   timerText: {fileID: 1738318468}
   scoreText: {fileID: 1408969052}

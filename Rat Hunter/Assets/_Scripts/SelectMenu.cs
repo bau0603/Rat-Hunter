@@ -27,10 +27,10 @@ public class SelectMenu : MonoBehaviour
     void Start()
     {
         // Add listener to the button click event
-        level1.onClick.AddListener(() => StartGame("Country"));
-        level2.onClick.AddListener(WIPLevel);
-        level3.onClick.AddListener(WIPLevel);
-        level4.onClick.AddListener(() => StartGame("Sewerline"));
+        level1.onClick.AddListener(() => StartGame("Level 1"));
+        level2.onClick.AddListener(() => StartGame("Level 2"));
+        level3.onClick.AddListener(() => StartGame("level 3"));
+        level4.onClick.AddListener(() => StartGame("Level 4"));
         returnB.onClick.AddListener(ToStart);
     }
 

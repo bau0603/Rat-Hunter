@@ -760,8 +760,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b649e77c36803a44aba2ecf89ffd906e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameTime: 60
-  targetRats: 15
+  gameTime: 120
+  targetRats: 40
   playerLives: 3
   timerText: {fileID: 263517042}
   scoreText: {fileID: 1614281201}
