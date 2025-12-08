@@ -419,7 +419,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e2b45ef13d670a44afa028c740fc0fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: 4
+  currentState: 0
   moveSpeed: 8
   tranquilizedSpeed: 3
   directionChangeInterval: 0.5
