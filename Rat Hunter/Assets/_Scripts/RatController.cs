@@ -8,6 +8,9 @@ public class RatController : MonoBehaviour
     [Header("Rat State")]
     public RatState currentState = RatState.Normal;
 
+    [Header("Spawn Settings")]
+    public float spawnY = -9f;   // default used by old levels
+
     [Header("Movement Settings")]
     public float moveSpeed = 3f;
     public float tranquilizedSpeed = 1f;
@@ -43,7 +46,7 @@ public class RatController : MonoBehaviour
         // Randomly choose starting side and direction
         bool startFromLeft = Random.Range(0, 2) == 0;
         float startX = startFromLeft ? -15f : 15f;
-        transform.position = new Vector3(startX, -9f, 0f);
+        transform.position = new Vector3(startX, spawnY, 0f);
 
         // Random movement direction
         moveDirection = startFromLeft ? Vector3.right : Vector3.left;

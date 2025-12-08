@@ -13,6 +13,7 @@ public class RatHunter : MonoBehaviour
     public int targetRats = 10;
     public int playerLives = 3;
     private static int level = 1;
+    private static int runningScore = 0; // NEW: Persistent score across levels
 
     [Header("UI References")]
     public Text timerText;
@@ -35,6 +36,7 @@ public class RatHunter : MonoBehaviour
 
     private float currentTime;
     private bool isGameOver = false;
+    private int levelStartScore = 0; // NEW: Score at start of current level
 
     void Awake()
     {
@@ -55,6 +57,10 @@ public class RatHunter : MonoBehaviour
         {
             level = 1;
         }
+
+        // NEW: Set current score from persistent score
+        currentScore = runningScore;
+        levelStartScore = runningScore; // Store starting score for this level
 
         currentTime = gameTime;
         UpdateUI();
@@ -104,6 +110,7 @@ public class RatHunter : MonoBehaviour
     public void AddScore(int points)
     {
         currentScore += points;
+        runningScore = currentScore; // NEW: Update persistent score
         ratsCaptured++;
         UpdateUI();
     }
@@ -146,6 +153,9 @@ public class RatHunter : MonoBehaviour
     {
         Debug.Log("Restart button clicked");
 
+        // NEW: Reset persistent score to what it was at level start
+        runningScore = levelStartScore;
+
         // Resume normal time scale before loading new scene
         Time.timeScale = 1f;
 
@@ -156,6 +166,9 @@ public class RatHunter : MonoBehaviour
     public void ContinueToNextLevel()
     {
         Debug.Log("Continue button clicked");
+
+        // NEW: Persistent score is already up-to-date from AddScore()
+        // No need to modify it here
 
         // Resume normal time scale
         Time.timeScale = 1f;
@@ -174,6 +187,7 @@ public class RatHunter : MonoBehaviour
             {
                 Debug.LogError($"Scene '{nextScene}' not found! Loading Level 1 instead.");
                 level = 1;
+                runningScore = 0; // NEW: Reset persistent score on error
                 SceneManager.LoadScene("Level 1");
             }
         }
@@ -181,6 +195,7 @@ public class RatHunter : MonoBehaviour
         {
             Debug.Log("Already at max level, restarting from Level 1");
             level = 1;
+            runningScore = 0; // NEW: Reset persistent score when completing all levels
             SceneManager.LoadScene("Level 1");
         }
     }
@@ -188,6 +203,9 @@ public class RatHunter : MonoBehaviour
     public void MainMenu()
     {
         Debug.Log("Menu button clicked");
+
+        // NEW: Reset persistent score to zero
+        runningScore = 0;
 
         // Resume normal time scale
         Time.timeScale = 1f;

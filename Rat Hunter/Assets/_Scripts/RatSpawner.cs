@@ -13,6 +13,9 @@ public class RatSpawner : MonoBehaviour
     [Range(0f, 1f)]
     public float speedyRatChance = 0.2f; // 20% chance for the Speedy Rat
 
+    [Range(0f, 1f)]
+    public float tankRatChance = 0.1f;   // NEW – maybe 10% to start
+
     private int currentRats = 0;
 
     void Start()
@@ -45,39 +48,54 @@ public class RatSpawner : MonoBehaviour
             return;
         }
 
-        GameObject selectedRatPrefab;
+        GameObject selectedRatPrefab = ratPrefabs[0]; // default to Base
 
-        // NEW LOGIC: Determine which rat to spawn based on probability
-        if (Random.value < speedyRatChance && ratPrefabs.Count > 1)
+        float roll = Random.value;
+
+        // If we have 3 prefabs: 0 = Base, 1 = Speedy, 2 = Tank
+        if (ratPrefabs.Count >= 3)
         {
-            // Assuming the second element (index 1) is the Speedy Rat
-            selectedRatPrefab = ratPrefabs[1]; 
+            if (roll < tankRatChance)
+            {
+                selectedRatPrefab = ratPrefabs[2]; // Tank
+            }
+            else if (roll < tankRatChance + speedyRatChance)
+            {
+                selectedRatPrefab = ratPrefabs[1]; // Speedy
+            }
+            else
+            {
+                selectedRatPrefab = ratPrefabs[0]; // Base
+            }
         }
-        else
+        else if (ratPrefabs.Count >= 2)
         {
-            // Default to the first element (index 0) which is the Base Rat
-            selectedRatPrefab = ratPrefabs[0]; 
+            // Old behaviour: just Base + Speedy
+            if (roll < speedyRatChance)
+            {
+                selectedRatPrefab = ratPrefabs[1]; // Speedy
+            }
+            else
+            {
+                selectedRatPrefab = ratPrefabs[0]; // Base
+            }
         }
 
-        GameObject rat = Instantiate(selectedRatPrefab, transform.position, Quaternion.identity); // Added position and rotation
+        GameObject rat = Instantiate(selectedRatPrefab, transform.position, Quaternion.identity);
         currentRats++;
 
-        // Listen for rat destruction
         RatController ratController = rat.GetComponent<RatController>();
         if (ratController != null)
         {
-            // We'll use a helper component to track when rats are destroyed
             RatTracker tracker = rat.AddComponent<RatTracker>();
             tracker.OnRatDestroyed += () => currentRats--;
         }
         else
         {
             Debug.LogError("RatController component missing on spawned rat prefab!");
-            // IMPORTANT: If RatController is missing, the rat won't move/be tracked.
         }
     }
 }
-
 // Helper component to track rat destruction
 public class RatTracker : MonoBehaviour
 {
