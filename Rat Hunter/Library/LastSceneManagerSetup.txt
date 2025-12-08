@@ -1,5 +1,9 @@
 sceneSetups:
+<<<<<<< HEAD
 - path: Assets/Scenes/Sewerline.unity
+=======
+- path: Assets/Scenes/Country.unity
+>>>>>>> Kehajana's-changes-
   isLoaded: 1
   isActive: 1
   isSubScene: 0
