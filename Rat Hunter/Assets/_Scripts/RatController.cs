@@ -200,7 +200,6 @@ public class RatController : MonoBehaviour
             Instantiate(captureEffect, transform.position, Quaternion.identity);
         }
 
-        // Add score
         if (RatHunter.Instance != null)
         {
             RatHunter.Instance.AddScore(points);

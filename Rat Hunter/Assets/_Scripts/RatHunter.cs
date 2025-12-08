@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class RatHunter : MonoBehaviour
 {
@@ -11,14 +12,21 @@ public class RatHunter : MonoBehaviour
     public float gameTime = 60f;
     public int targetRats = 10;
     public int playerLives = 3;
+    private static int level = 1;
 
     [Header("UI References")]
     public Text timerText;
     public Text scoreText;
     public Text livesText;
     public Text ratsCapturedText;
-    public GameObject gameOverPanel;
+
+    [Header("Game Over Menu")]
+    public GameObject gameOverMenu;
+    public Image gameOverPanel;
     public Text gameOverText;
+    public Button restartButton;
+    public Button continueButton;
+    public Button menuButton;
 
     [Header("Game State")]
     public int currentScore = 0;
@@ -41,9 +49,19 @@ public class RatHunter : MonoBehaviour
 
     void Start()
     {
+        // Reset static level if starting from Level 1
+        if (SceneManager.GetActiveScene().name == "Level 1")
+        {
+            level = 1;
+        }
+
         currentTime = gameTime;
         UpdateUI();
-        gameOverPanel.SetActive(false);
+        gameOverMenu.SetActive(false);
+
+        restartButton.onClick.AddListener(RestartGame);
+        menuButton.onClick.AddListener(MainMenu);
+        continueButton.onClick.AddListener(ContinueToNextLevel);
     }
 
     void Update()
@@ -68,7 +86,7 @@ public class RatHunter : MonoBehaviour
     {
         timerText.text = $"Time: {Mathf.CeilToInt(currentTime)}";
         scoreText.text = $"Score: {currentScore}";
-        livesText.text = $"Lives: {playerLives}";
+        livesText.text = $"Lives: {playerLives} / 3";
         ratsCapturedText.text = $"Captured: {ratsCaptured}/{targetRats}";
     }
 
@@ -93,33 +111,61 @@ public class RatHunter : MonoBehaviour
     void GameOver(bool won)
     {
         isGameActive = false;
-        gameOverPanel.SetActive(true);
-        gameOverText.text = won ? "You Win!" : "Game Over!";
-        gameOverText.color = won ? Color.green : Color.red;
+        gameOverMenu.SetActive(true);
+        gameOverText.text = won ? "You Win!" : "Game Over";
+        gameOverPanel.color = won ? Color.green : Color.red;
+
+        // Show continue button only if won and not on last level
+        if (won && level < 4)
+        {
+            continueButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            continueButton.gameObject.SetActive(false);
+        }
     }
 
     public void RestartGame()
     {
-        currentScore = 0;
-        ratsCaptured = 0;
-        playerLives = 3;
-        currentTime = gameTime;
-        isGameActive = true;
-        gameOverPanel.SetActive(false);
+        // Clear all active rats and decoys before restarting
+        CleanupSceneObjects();
 
-        // Clear all rats and decoys
+        // Reload the current level
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void ContinueToNextLevel()
+    {
+        if (level < 4)
+        {
+            level++;
+            CleanupSceneObjects();
+            SceneManager.LoadScene($"Level {level}");
+        }
+    }
+
+    public void MainMenu()
+    {
+        CleanupSceneObjects();
+        SceneManager.LoadScene("StartMenu");
+        level = 1; // Reset level progress when returning to menu
+    }
+
+    void CleanupSceneObjects()
+    {
+        // Clear all rats
         RatController[] rats = FindObjectsOfType<RatController>();
         foreach (RatController rat in rats)
         {
             Destroy(rat.gameObject);
         }
 
+        // Clear all decoys
         DecoyObject[] decoys = FindObjectsOfType<DecoyObject>();
         foreach (DecoyObject decoy in decoys)
         {
             Destroy(decoy.gameObject);
         }
-
-        UpdateUI();
     }
 }
