@@ -34,6 +34,7 @@ public class RatHunter : MonoBehaviour
     public bool isGameActive = true;
 
     private float currentTime;
+    private bool isGameOver = false;
 
     void Awake()
     {
@@ -58,15 +59,25 @@ public class RatHunter : MonoBehaviour
         currentTime = gameTime;
         UpdateUI();
         gameOverMenu.SetActive(false);
+        isGameOver = false;
 
+        // Setup button listeners
+        restartButton.onClick.RemoveAllListeners();
         restartButton.onClick.AddListener(RestartGame);
+
+        menuButton.onClick.RemoveAllListeners();
         menuButton.onClick.AddListener(MainMenu);
+
+        continueButton.onClick.RemoveAllListeners();
         continueButton.onClick.AddListener(ContinueToNextLevel);
+
+        // Initially hide continue button
+        continueButton.gameObject.SetActive(false);
     }
 
     void Update()
     {
-        if (!isGameActive) return;
+        if (!isGameActive || isGameOver) return;
 
         currentTime -= Time.deltaTime;
         UpdateUI();
@@ -111,6 +122,11 @@ public class RatHunter : MonoBehaviour
     void GameOver(bool won)
     {
         isGameActive = false;
+        isGameOver = true;
+
+        // Pause the game (important for button clicks to work!)
+        Time.timeScale = 0f;
+
         gameOverMenu.SetActive(true);
         gameOverText.text = won ? "You Win!" : "Game Over";
         gameOverPanel.color = won ? Color.green : Color.red;
@@ -128,28 +144,65 @@ public class RatHunter : MonoBehaviour
 
     public void RestartGame()
     {
-        // Clear all active rats and decoys before restarting
-        CleanupSceneObjects();
+        Debug.Log("Restart button clicked");
 
-        // Reload the current level
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        // Resume normal time scale before loading new scene
+        Time.timeScale = 1f;
+
+        string currentScene = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(currentScene);
     }
 
     public void ContinueToNextLevel()
     {
+        Debug.Log("Continue button clicked");
+
+        // Resume normal time scale
+        Time.timeScale = 1f;
+
         if (level < 4)
         {
             level++;
-            CleanupSceneObjects();
-            SceneManager.LoadScene($"Level {level}");
+            string nextScene = $"Level {level}";
+
+            // Check if the scene exists
+            if (SceneExists(nextScene))
+            {
+                SceneManager.LoadScene(nextScene);
+            }
+            else
+            {
+                Debug.LogError($"Scene '{nextScene}' not found! Loading Level 1 instead.");
+                level = 1;
+                SceneManager.LoadScene("Level 1");
+            }
+        }
+        else
+        {
+            Debug.Log("Already at max level, restarting from Level 1");
+            level = 1;
+            SceneManager.LoadScene("Level 1");
         }
     }
 
     public void MainMenu()
     {
-        CleanupSceneObjects();
-        SceneManager.LoadScene("StartMenu");
+        Debug.Log("Menu button clicked");
+
+        // Resume normal time scale
+        Time.timeScale = 1f;
+
         level = 1; // Reset level progress when returning to menu
+        SceneManager.LoadScene("StartMenu");
+    }
+
+    bool SceneExists(string sceneName)
+    {
+        return sceneName == "Level 1" ||
+               sceneName == "Level 2" ||
+               sceneName == "Level 3" ||
+               sceneName == "Level 4" ||
+               sceneName == "StartMenu";
     }
 
     void CleanupSceneObjects()

@@ -10,8 +10,8 @@ public class ShootingController : MonoBehaviour
     public GameObject netPrefab;
 
     [Header("2D Shooting Settings")]
-    public float shootingPlaneZ = 10f; // Z position where projectiles exist (where rats are)
-    public float projectileSpawnZ = -5f; // Z position where projectiles spawn (in front of camera)
+    public float shootingPlaneZ = 0f; // Changed to 0 (where rats are)
+    public float projectileSpawnZ = -1f; // In front of camera
 
     [Header("Audio")]
     public AudioClip tranquilizerSound;
@@ -24,7 +24,19 @@ public class ShootingController : MonoBehaviour
     void Start()
     {
         mainCamera = Camera.main;
+
+        // Get or Add AudioSource component
         audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            // Add AudioSource if missing
+            audioSource = gameObject.AddComponent<AudioSource>();
+            Debug.Log("Added AudioSource component to ShootingController");
+        }
+
+        // Configure AudioSource
+        audioSource.playOnAwake = false;
+        audioSource.loop = false;
 
         if (mainCamera == null)
         {
@@ -60,7 +72,7 @@ public class ShootingController : MonoBehaviour
         // Get mouse position in screen coordinates
         Vector3 mouseScreenPosition = Input.mousePosition;
 
-        // Convert mouse position to world position on the shooting plane (where rats are)
+        // Convert mouse position to world position on the shooting plane
         Vector3 targetWorldPosition = GetWorldPositionOnShootingPlane(mouseScreenPosition);
 
         // Determine spawn position (in front of camera, on spawn plane)
@@ -95,42 +107,52 @@ public class ShootingController : MonoBehaviour
 
     Vector3 GetWorldPositionOnShootingPlane(Vector3 mouseScreenPosition)
     {
-        // Create a plane at Z = shootingPlaneZ where the rats exist
-        // This simulates shooting at objects in the 2D plane
+        // Set Z to shooting plane (where rats are)
         mouseScreenPosition.z = shootingPlaneZ - mainCamera.transform.position.z;
 
         // Convert screen position to world position
-        Vector3 worldPosition = mainCamera.ScreenToWorldPoint(mouseScreenPosition);
-
-        return worldPosition;
+        return mainCamera.ScreenToWorldPoint(mouseScreenPosition);
     }
 
     Vector3 GetProjectileSpawnPosition(Vector3 mouseScreenPosition)
     {
-        // Spawn projectiles slightly in front of the camera on the spawn plane
-        // This creates a "shooting from camera" effect
+        // Set Z to spawn plane (in front of camera)
         mouseScreenPosition.z = projectileSpawnZ - mainCamera.transform.position.z;
 
-        // Convert screen position to world position on spawn plane
-        Vector3 spawnPosition = mainCamera.ScreenToWorldPoint(mouseScreenPosition);
-
-        return spawnPosition;
+        // Convert screen position to world position
+        return mainCamera.ScreenToWorldPoint(mouseScreenPosition);
     }
 
     void PlayShootSound(Projectile.ProjectileType type)
     {
-        if (audioSource == null) return;
+        if (audioSource == null)
+        {
+            Debug.LogError("AudioSource is null! Cannot play sound.");
+            return;
+        }
+
+        AudioClip clipToPlay = null;
 
         switch (type)
         {
             case Projectile.ProjectileType.Tranquilizer:
-                if (tranquilizerSound != null)
-                    audioSource.PlayOneShot(tranquilizerSound);
+                clipToPlay = tranquilizerSound;
+                Debug.Log("Attempting to play tranquilizer sound");
                 break;
             case Projectile.ProjectileType.Net:
-                if (netSound != null)
-                    audioSource.PlayOneShot(netSound);
+                clipToPlay = netSound;
+                Debug.Log("Attempting to play net sound");
                 break;
+        }
+
+        if (clipToPlay != null)
+        {
+            audioSource.PlayOneShot(clipToPlay);
+            Debug.Log("Playing sound: " + clipToPlay.name);
+        }
+        else
+        {
+            Debug.LogWarning("Sound clip is null for type: " + type);
         }
     }
 }
