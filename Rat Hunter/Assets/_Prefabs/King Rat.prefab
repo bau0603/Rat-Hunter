@@ -1890,11 +1890,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e2b45ef13d670a44afa028c740fc0fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: 3
+  currentState: 0
   moveSpeed: 5
   tranquilizedSpeed: 1
   directionChangeInterval: 0.5
-  tranquilizedDuration: 5
+  tranquilizedDuration: 0.5
   normalMaterial: {fileID: 0}
   tranquilizedMaterial: {fileID: 0}
   captureEffect: {fileID: 0}

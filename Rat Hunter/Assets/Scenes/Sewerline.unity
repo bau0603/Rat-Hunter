@@ -433,6 +433,7 @@ MonoBehaviour:
   gameTime: 30
   targetRats: 40
   playerLives: 3
+<<<<<<< HEAD
   timerText: {fileID: 1999998873}
   scoreText: {fileID: 734674363}
   livesText: {fileID: 1095048827}
@@ -444,6 +445,19 @@ MonoBehaviour:
   continueButton: {fileID: 690702629}
   menuButton: {fileID: 167731050}
   currentScore: 0
+=======
+  timerText: {fileID: 2024599731}
+  scoreText: {fileID: 633563132}
+  livesText: {fileID: 1839737737}
+  ratsCapturedText: {fileID: 998241838}
+  gameOverMenu: {fileID: 2041983658}
+  gameOverPanel: {fileID: 996084197}
+  gameOverText: {fileID: 1119544696}
+  restartButton: {fileID: 2019573643}
+  continueButton: {fileID: 76075106}
+  menuButton: {fileID: 1352504104}
+  currentScore: 419
+>>>>>>> Kehajana's-changes-
   ratsCaptured: 0
   isGameActive: 1
 --- !u!4 &270404606
@@ -1031,6 +1045,7 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
+  - component: {fileID: 963194230}
   m_Layer: 11
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1129,11 +1144,114 @@ MonoBehaviour:
   projectileLifetime: 5
   tranquilizerPrefab: {fileID: 5577350477173092037, guid: cefbcc633832649408f33dfc6729c7a2, type: 3}
   netPrefab: {fileID: 469446120439244134, guid: ed9cfec6b0fa26548a1f191dd42e1552, type: 3}
+<<<<<<< HEAD
   shootingPlaneZ: 10
   projectileSpawnZ: -5
   tranquilizerSound: {fileID: 0}
   netSound: {fileID: 0}
 --- !u!1 &1095048825
+=======
+  projectileSpawnPoint: {fileID: 963194228}
+  tranquilizerSound: {fileID: 8300000, guid: d9419ba0bfac1e84a95418ac5851caf6, type: 3}
+  netSound: {fileID: 8300000, guid: a58e438b7cfa445498120af0e6169082, type: 3}
+--- !u!82 &963194230
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: ac2f66edd1d8d7d4daad3f2b2c78c908, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!1 &996084195
+>>>>>>> Kehajana's-changes-
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
