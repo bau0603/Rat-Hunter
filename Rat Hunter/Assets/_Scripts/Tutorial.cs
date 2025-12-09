@@ -6,37 +6,29 @@ using UnityEngine.SceneManagement;
 public class Tutorial : MonoBehaviour
 {
     [Header("Tutorial Settings")]
-    public GameObject tutorialPanel; // Parent panel for all tutorial elements
+    public GameObject tutorialCanvas; // Parent for all tutorial elements
     public Text tutorialText;
     public float displayTime = 15f; // Time in seconds before fade out
     public float fadeDuration = 2f; // Time for fade out animation
 
     [Header("Tutorial Content")]
     public Button skipButton;
+    public CanvasGroup canvasGroup;
 
-    private CanvasGroup canvasGroup;
     private Coroutine fadeCoroutine;
 
     void Start()
     {
-        // Only show tutorial on Level 1
-        if (SceneManager.GetActiveScene().name != "Level 1")
-        {
-            if (tutorialPanel != null)
-                tutorialPanel.SetActive(false);
-            return;
-        }
-
         // Initialize tutorial panel
-        if (tutorialPanel != null)
+        if (tutorialCanvas != null)
         {
-            tutorialPanel.SetActive(true);
+            tutorialCanvas.SetActive(true);
 
             // Add CanvasGroup if not present
-            canvasGroup = tutorialPanel.GetComponent<CanvasGroup>();
+            canvasGroup = tutorialCanvas.GetComponent<CanvasGroup>();
             if (canvasGroup == null)
             {
-                canvasGroup = tutorialPanel.AddComponent<CanvasGroup>();
+                canvasGroup = tutorialCanvas.AddComponent<CanvasGroup>();
             }
 
             // Set initial transparency to fully visible
@@ -71,8 +63,8 @@ public class Tutorial : MonoBehaviour
         else
         {
             // If no CanvasGroup, just hide the panel
-            if (tutorialPanel != null)
-                tutorialPanel.SetActive(false);
+            if (tutorialCanvas != null)
+                tutorialCanvas.SetActive(false);
         }
     }
 
@@ -97,7 +89,7 @@ public class Tutorial : MonoBehaviour
         canvasGroup.blocksRaycasts = false;
 
         // Optional: Hide the panel completely
-        // tutorialPanel.SetActive(false);
+        // tutorialCanvas.SetActive(false);
     }
 
     // Public method to manually hide tutorial (for skip button)
@@ -110,18 +102,18 @@ public class Tutorial : MonoBehaviour
 
             StartCoroutine(FadeOutTutorial());
         }
-        else if (tutorialPanel != null)
+        else if (tutorialCanvas != null)
         {
-            tutorialPanel.SetActive(false);
+            tutorialCanvas.SetActive(false);
         }
     }
 
     // Public method to show tutorial again (for help button)
     public void ShowTutorial()
     {
-        if (tutorialPanel != null && canvasGroup != null)
+        if (tutorialCanvas != null && canvasGroup != null)
         {
-            tutorialPanel.SetActive(true);
+            tutorialCanvas.SetActive(true);
             canvasGroup.alpha = 1f;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
