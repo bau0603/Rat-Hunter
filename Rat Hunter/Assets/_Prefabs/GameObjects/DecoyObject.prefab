@@ -41,19 +41,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 3786337368047993811}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59dac3587b157da49a5231eb87e91459, type: 3}
+  m_Script: {fileID: 11500000, guid: bf8b4c25aebbc1f4b9f6ccd906ea0fc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   decoyPrefabs:
-  - {fileID: 4587173504764319568, guid: d47925ef81596974496d860da767bd2e, type: 3}
   - {fileID: 2766267015278326924, guid: 8f0740d1caa0d7c48b98d8d796229f48, type: 3}
-  minSpawnTime: 5
-  maxSpawnTime: 10
-  maxDecoys: 3
+  - {fileID: 100000, guid: 0a0d02952336e2446af995ca257a42d4, type: 3}
+  minSpawnTime: 1
+  maxSpawnTime: 4
+  maxDecoys: 5
   minX: -10
   maxX: 10
-  yPosition: -9
-  lifeTime: 3
-  scorePenalty: 1
-  minMoveSpeed: 2
-  maxMoveSpeed: 4
+  yPosition: 0.2

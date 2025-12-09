@@ -264,6 +264,66 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: maxRats
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: tankRatChance
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: speedyRatChance
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: normalizeChances
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: totalChanceDisplay
+      value: 1.5999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: ratPrefabs.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: ratPrefabs.Array.data[2]
+      value: 
+      objectReference: {fileID: 5681190576489505949, guid: 9833d267c1df16c4e9b29f4c5ef16b79, type: 3}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: ratPrefabs.Array.data[0].prefab
+      value: 
+      objectReference: {fileID: 5681190576489505949, guid: dde3cfa151d0056458337334a2a433eb, type: 3}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: ratPrefabs.Array.data[1].prefab
+      value: 
+      objectReference: {fileID: 5681190576489505949, guid: 4f45939347481784ab648ff37046f3d0, type: 3}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: ratPrefabs.Array.data[2].prefab
+      value: 
+      objectReference: {fileID: 5681190576489505949, guid: 9833d267c1df16c4e9b29f4c5ef16b79, type: 3}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: ratPrefabs.Array.data[0].spawnChance
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: ratPrefabs.Array.data[1].ratTypeName
+      value: Speedy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: ratPrefabs.Array.data[1].spawnChance
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: ratPrefabs.Array.data[2].ratTypeName
+      value: Tanky
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: ratPrefabs.Array.data[2].spawnChance
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 7754932935482732917, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
       propertyPath: m_Name
       value: RatSpawner
@@ -658,6 +718,10 @@ PrefabInstance:
     - target: {fileID: 6320184325759985041, guid: 4a80a284ce62e194c9a6fb9a14b75d92, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8729427294835324019, guid: 4a80a284ce62e194c9a6fb9a14b75d92, type: 3}
+      propertyPath: yPosition
+      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

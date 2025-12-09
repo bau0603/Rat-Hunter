@@ -10,13 +10,15 @@ public class StartMenu : MonoBehaviour
     public Button startButton;
     public Button selectButton;
     public Button creditButton;
+    public Button instrButton;
 
     void Start()
     {
         // Add listener to the button click event
         startButton.onClick.AddListener(StartGame);
         selectButton.onClick.AddListener(SelectLevel);
-        creditButton.onClick.AddListener(EndlessMode);
+        creditButton.onClick.AddListener(CreditMode);
+        instrButton.onClick.AddListener(Instructions);
     }
 
     void StartGame()
@@ -30,8 +32,13 @@ public class StartMenu : MonoBehaviour
         SceneManager.LoadScene("SelectLevel");
     }
 
-    void EndlessMode()
+    void CreditMode()
     {
         SceneManager.LoadScene("Credits");
+    }
+
+    void Instructions()
+    {
+        SceneManager.LoadScene("Instructions");
     }
 }

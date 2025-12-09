@@ -1,9 +1,10 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class RatController : MonoBehaviour
 {
-    public enum RatState { Normal, Tranquilized, Captured, Kingy, Speedy, Jumpy, Tanky }
+    public enum RatState { Normal, Tranquilized, Captured }
 
     [Header("Rat State")]
     public RatState currentState = RatState.Normal;
@@ -13,25 +14,32 @@ public class RatController : MonoBehaviour
 
     [Header("Movement Settings")]
     public float moveSpeed = 3f;
-    public float tranquilizedSpeed = 1f;
     public float directionChangeInterval = 2f;
 
     [Header("Tranquilizer Settings")]
     public float tranquilizedDuration = 3.0f;
+    public float tranquilizedSpeed = 1f;
     private Coroutine tranquilizedCoroutine;
 
     [Header("Effects")]
     public Material normalMaterial;
     public Material tranquilizedMaterial;
-    public ParticleSystem captureEffect;
 
     [Header("Points")]
     public int points = 100;
 
+    /*
+    Change to public for Inspector access, keep private for now
+    [Header("Included Body Parts")]
+    [Tooltip("Exact names of body parts that should change color when tranquilized")]
+    */
+
+    private string[] includedBodyParts = { "Head", "Body", "Snout", "LeftEar", "RightEar" };
+
     [HideInInspector] public bool isTranquilized = false;
 
     private Vector3 moveDirection;
-    private Renderer ratRenderer;
+    private List<Renderer> bodyRenderers;  // Only renderers for specified body parts
     private float currentSpeed;
     private bool isCaptured = false;
     private float directionTimer;
@@ -39,7 +47,9 @@ public class RatController : MonoBehaviour
 
     void Start()
     {
-        ratRenderer = GetComponent<Renderer>();
+        // Find only the specified body part renderers
+        RatBodyRenderers();
+
         originalScale = transform.localScale;
         currentSpeed = moveSpeed;
 
@@ -57,11 +67,8 @@ public class RatController : MonoBehaviour
         // Set initial visual direction
         UpdateVisualDirection();
 
-        // Apply normal material
-        if (ratRenderer && normalMaterial)
-        {
-            ratRenderer.material = normalMaterial;
-        }
+        // Apply normal material to specified body renderers only
+        ApplyMaterialToBodyRenderers(normalMaterial);
     }
 
     void Update()
@@ -119,6 +126,45 @@ public class RatController : MonoBehaviour
         }
     }
 
+    private void RatBodyRenderers()
+    {
+        bodyRenderers = new List<Renderer>();
+
+        // Get ALL renderers in hierarchy first
+        Renderer[] allRenderers = GetComponentsInChildren<Renderer>();
+
+        Debug.Log($"Found {allRenderers.Length} total renderers on rat: {gameObject.name}");
+
+        // Only include renderers with exact matching names
+        foreach (Renderer renderer in allRenderers)
+        {
+            string objectName = renderer.gameObject.name;
+            bool isIncluded = false;
+
+            // Check if this renderer is in our included list (exact match)
+            foreach (string includedPart in includedBodyParts)
+            {
+                if (objectName == includedPart)
+                {
+                    isIncluded = true;
+                    break;
+                }
+            }
+
+            if (isIncluded)
+            {
+                bodyRenderers.Add(renderer);
+                Debug.Log($"Including {objectName} for material changes");
+            }
+            else
+            {
+                Debug.Log($"Excluding {objectName} (not in included list)");
+            }
+        }
+
+        Debug.Log($"Found {bodyRenderers.Count} specified body renderers for material changes");
+    }
+
     // Called when rat is shot by projectile
     public void OnShot(Projectile.ProjectileType type)
     {
@@ -144,17 +190,20 @@ public class RatController : MonoBehaviour
 
     public void GetTranquilized()
     {
-        if (isTranquilized || isCaptured || currentState != RatState.Normal) return;
+        if (isTranquilized || isCaptured || currentState != RatState.Normal)
+        {
+            Debug.Log($"Cannot tranquilize: isTranquilized={isTranquilized}, isCaptured={isCaptured}, state={currentState}");
+            return;
+        }
+
+        Debug.Log("Applying tranquilizer effect to specified body parts only...");
 
         isTranquilized = true;
         currentState = RatState.Tranquilized;
         currentSpeed = tranquilizedSpeed;
 
-        // Update material
-        if (ratRenderer && tranquilizedMaterial)
-        {
-            ratRenderer.material = tranquilizedMaterial;
-        }
+        // Update material for specified body renderers only
+        ApplyMaterialToBodyRenderers(tranquilizedMaterial);
 
         // Start tranquilizer timer
         if (tranquilizedCoroutine != null)
@@ -175,17 +224,17 @@ public class RatController : MonoBehaviour
             isTranquilized = false;
             currentSpeed = moveSpeed;
 
-            // Revert to normal material
-            if (ratRenderer && normalMaterial)
-            {
-                ratRenderer.material = normalMaterial;
-            }
+            // Revert to normal material for specified body renderers only
+            ApplyMaterialToBodyRenderers(normalMaterial);
+            Debug.Log("Tranquilizer wore off - reverted to normal material");
         }
     }
 
     public void GetCaptured()
     {
         if (isCaptured || currentState == RatState.Captured) return;
+
+        Debug.Log("Capturing rat...");
 
         isCaptured = true;
         currentState = RatState.Captured;
@@ -195,12 +244,6 @@ public class RatController : MonoBehaviour
         {
             StopCoroutine(tranquilizedCoroutine);
             tranquilizedCoroutine = null;
-        }
-
-        // Play capture effect
-        if (captureEffect)
-        {
-            Instantiate(captureEffect, transform.position, Quaternion.identity);
         }
 
         if (RatHunter.Instance != null)
@@ -217,6 +260,9 @@ public class RatController : MonoBehaviour
         float captureDuration = 1f;
         float currentTime = 0f;
 
+        // Get ALL renderers for fade out (including everything for complete fade)
+        Renderer[] allRenderers = GetComponentsInChildren<Renderer>();
+
         // Shrink and fade out
         while (currentTime < captureDuration)
         {
@@ -226,18 +272,55 @@ public class RatController : MonoBehaviour
             // Shrink scale
             transform.localScale = originalScale * (1f - progress * 0.5f);
 
-            // Fade out
-            if (ratRenderer)
-            {
-                Material mat = ratRenderer.material;
-                Color originalColor = mat.color;
-                mat.color = new Color(originalColor.r, originalColor.g, originalColor.b, 1f - progress);
-            }
+            // Fade out ALL renderers (entire rat disappears)
+            FadeOutRenderers(allRenderers, progress);
 
             yield return null;
         }
 
         Destroy(gameObject);
+    }
+
+    // Helper method to apply material to specified body renderers only
+    private void ApplyMaterialToBodyRenderers(Material material)
+    {
+        if (bodyRenderers == null || bodyRenderers.Count == 0)
+        {
+            Debug.LogWarning("No specified body renderers found!");
+            return;
+        }
+
+        if (material == null)
+        {
+            Debug.LogError("Material is null!");
+            return;
+        }
+
+        foreach (Renderer renderer in bodyRenderers)
+        {
+            if (renderer != null)
+            {
+                renderer.material = material;
+            }
+        }
+
+        Debug.Log($"Applied material '{material.name}' to {bodyRenderers.Count} body parts");
+    }
+
+    // Helper method to fade out renderers
+    private void FadeOutRenderers(Renderer[] renderers, float progress)
+    {
+        if (renderers == null || renderers.Length == 0) return;
+
+        foreach (Renderer renderer in renderers)
+        {
+            if (renderer != null)
+            {
+                Material mat = renderer.material;
+                Color originalColor = mat.color;
+                mat.color = new Color(originalColor.r, originalColor.g, originalColor.b, 1f - progress);
+            }
+        }
     }
 
     // Backwards compatibility with existing Projectile script

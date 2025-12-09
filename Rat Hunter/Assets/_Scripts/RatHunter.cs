@@ -131,7 +131,6 @@ public class RatHunter : MonoBehaviour
         isGameActive = false;
         isGameOver = true;
 
-        // Pause the game (important for button clicks to work!)
         Time.timeScale = 0f;
 
         gameOverMenu.SetActive(true);
@@ -167,9 +166,6 @@ public class RatHunter : MonoBehaviour
     {
         Debug.Log("Continue button clicked");
 
-        // NEW: Persistent score is already up-to-date from AddScore()
-        // No need to modify it here
-
         // Resume normal time scale
         Time.timeScale = 1f;
 
@@ -187,16 +183,16 @@ public class RatHunter : MonoBehaviour
             {
                 Debug.LogError($"Scene '{nextScene}' not found! Loading Level 1 instead.");
                 level = 1;
-                runningScore = 0; // NEW: Reset persistent score on error
+                runningScore = 0;
                 SceneManager.LoadScene("Level 1");
             }
         }
         else
         {
-            Debug.Log("Already at max level, restarting from Level 1");
+            Debug.Log("Already at max level, returning to Main Menu");
             level = 1;
-            runningScore = 0; // NEW: Reset persistent score when completing all levels
-            SceneManager.LoadScene("Level 1");
+            runningScore = 0;
+            SceneManager.LoadScene("StartMenu");
         }
     }
 
@@ -232,11 +228,13 @@ public class RatHunter : MonoBehaviour
             Destroy(rat.gameObject);
         }
 
-        // Clear all decoys
-        DecoyObject[] decoys = FindObjectsOfType<DecoyObject>();
-        foreach (DecoyObject decoy in decoys)
+
+        // Clear all Decoy objects
+        DecoyInstance[] decoys = FindObjectsOfType<DecoyInstance>();
+        foreach (DecoyInstance decoy in decoys)
         {
             Destroy(decoy.gameObject);
         }
+
     }
 }
