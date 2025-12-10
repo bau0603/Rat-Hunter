@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class CreditsMenu : MonoBehaviour
+public class MiscMenu : MonoBehaviour
 {
     public Button returnB;
 

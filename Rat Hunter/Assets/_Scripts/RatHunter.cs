@@ -52,11 +52,8 @@ public class RatHunter : MonoBehaviour
 
     void Start()
     {
-        // Reset static level if starting from Level 1
-        if (SceneManager.GetActiveScene().name == "Level 1")
-        {
-            level = 1;
-        }
+        // NEW: Detect which level we're starting from and set the static level variable
+        SetLevelFromSceneName();
 
         // NEW: Set current score from persistent score
         currentScore = runningScore;
@@ -79,6 +76,32 @@ public class RatHunter : MonoBehaviour
 
         // Initially hide continue button
         continueButton.gameObject.SetActive(false);
+    }
+
+    // NEW: Method to detect and set level from scene name
+    void SetLevelFromSceneName()
+    {
+        string sceneName = SceneManager.GetActiveScene().name;
+
+        switch (sceneName)
+        {
+            case "Level 1":
+                level = 1;
+                break;
+            case "Level 2":
+                level = 2;
+                break;
+            case "Level 3":
+                level = 3;
+                break;
+            case "Level 4":
+                level = 4;
+                break;
+            default:
+                // If not a numbered level, assume it's Level 1
+                level = 1;
+                break;
+        }
     }
 
     void Update()
@@ -228,13 +251,11 @@ public class RatHunter : MonoBehaviour
             Destroy(rat.gameObject);
         }
 
-
         // Clear all Decoy objects
         DecoyInstance[] decoys = FindObjectsOfType<DecoyInstance>();
         foreach (DecoyInstance decoy in decoys)
         {
             Destroy(decoy.gameObject);
         }
-
     }
 }
