@@ -11,10 +11,19 @@ public class RatController : MonoBehaviour
 
     [Header("Spawn Settings")]
     public float spawnY = -9f;   // default used by old levels
+    public float spawnZ = 5f; // slot position on Z axis
 
     [Header("Movement Settings")]
     public float moveSpeed = 3f;
     public float directionChangeInterval = 2f;
+
+    [Header("Jump Settings")]
+    public float jumpForce = 5f;
+    public float jumpInterval = 1.5f;
+    public float jumpCooldown = 0.5f;
+    private float jumpTimer;
+    private bool canJump = true;
+    private Rigidbody rb;
 
     [Header("Tranquilizer Settings")]
     public float tranquilizedDuration = 3.0f;
@@ -27,12 +36,6 @@ public class RatController : MonoBehaviour
 
     [Header("Points")]
     public int points = 100;
-
-    /*
-    Change to public for Inspector access, keep private for now
-    [Header("Included Body Parts")]
-    [Tooltip("Exact names of body parts that should change color when tranquilized")]
-    */
 
     private string[] includedBodyParts = { "Head", "Body", "Snout", "LeftEar", "RightEar" };
 
@@ -50,19 +53,31 @@ public class RatController : MonoBehaviour
         // Find only the specified body part renderers
         RatBodyRenderers();
 
+        // Get Rigidbody component
+        rb = GetComponent<Rigidbody>();
+        if (rb == null)
+        {
+            rb = gameObject.AddComponent<Rigidbody>();
+            rb.useGravity = true;
+            rb.constraints = RigidbodyConstraints.FreezeRotation;
+        }
+
         originalScale = transform.localScale;
         currentSpeed = moveSpeed;
 
         // Randomly choose starting side and direction
         bool startFromLeft = Random.Range(0, 2) == 0;
         float startX = startFromLeft ? -15f : 15f;
-        transform.position = new Vector3(startX, spawnY, 0f);
+        transform.position = new Vector3(startX, spawnY, spawnZ);
 
         // Random movement direction
         moveDirection = startFromLeft ? Vector3.right : Vector3.left;
 
         // Randomize speed slightly
         currentSpeed *= Random.Range(0.8f, 1.2f);
+
+        // Randomize jump interval slightly
+        jumpInterval *= Random.Range(0.8f, 1.2f);
 
         // Set initial visual direction
         UpdateVisualDirection();
@@ -83,13 +98,26 @@ public class RatController : MonoBehaviour
             directionTimer = 0f;
         }
 
+        // Handle jumping
+        if (currentState == RatState.Normal && canJump)
+        {
+            jumpTimer += Time.deltaTime;
+            if (jumpTimer >= jumpInterval)
+            {
+                AttemptJump();
+                jumpTimer = 0f;
+            }
+        }
+
         MoveRat();
         CheckBounds();
     }
 
     void MoveRat()
     {
-        transform.position += moveDirection * currentSpeed * Time.deltaTime;
+        // Only apply horizontal movement through transform, vertical movement through physics
+        Vector3 horizontalMovement = moveDirection * currentSpeed * Time.deltaTime;
+        transform.position += new Vector3(horizontalMovement.x, 0f, 0f);
     }
 
     void CheckBounds()
@@ -126,14 +154,41 @@ public class RatController : MonoBehaviour
         }
     }
 
+    void AttemptJump()
+    {
+        if (currentState != RatState.Normal || !canJump) return;
+
+        // Random chance to jump
+        if (Random.Range(0, 2) == 0) // 50% chance default
+        {
+            Jump();
+        }
+    }
+
+    void Jump()
+    {
+        if (rb == null) return;
+
+        // Apply jump force
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+        // Start cooldown
+        canJump = false;
+        StartCoroutine(JumpCooldown());
+    }
+
+    IEnumerator JumpCooldown()
+    {
+        yield return new WaitForSeconds(jumpCooldown);
+        canJump = true;
+    }
+
     private void RatBodyRenderers()
     {
         bodyRenderers = new List<Renderer>();
 
         // Get ALL renderers in hierarchy first
         Renderer[] allRenderers = GetComponentsInChildren<Renderer>();
-
-        Debug.Log($"Found {allRenderers.Length} total renderers on rat: {gameObject.name}");
 
         // Only include renderers with exact matching names
         foreach (Renderer renderer in allRenderers)
@@ -154,15 +209,8 @@ public class RatController : MonoBehaviour
             if (isIncluded)
             {
                 bodyRenderers.Add(renderer);
-                Debug.Log($"Including {objectName} for material changes");
-            }
-            else
-            {
-                Debug.Log($"Excluding {objectName} (not in included list)");
             }
         }
-
-        Debug.Log($"Found {bodyRenderers.Count} specified body renderers for material changes");
     }
 
     // Called when rat is shot by projectile
@@ -192,11 +240,8 @@ public class RatController : MonoBehaviour
     {
         if (isTranquilized || isCaptured || currentState != RatState.Normal)
         {
-            Debug.Log($"Cannot tranquilize: isTranquilized={isTranquilized}, isCaptured={isCaptured}, state={currentState}");
             return;
         }
-
-        Debug.Log("Applying tranquilizer effect to specified body parts only...");
 
         isTranquilized = true;
         currentState = RatState.Tranquilized;
@@ -226,15 +271,12 @@ public class RatController : MonoBehaviour
 
             // Revert to normal material for specified body renderers only
             ApplyMaterialToBodyRenderers(normalMaterial);
-            Debug.Log("Tranquilizer wore off - reverted to normal material");
         }
     }
 
     public void GetCaptured()
     {
         if (isCaptured || currentState == RatState.Captured) return;
-
-        Debug.Log("Capturing rat...");
 
         isCaptured = true;
         currentState = RatState.Captured;
@@ -286,13 +328,11 @@ public class RatController : MonoBehaviour
     {
         if (bodyRenderers == null || bodyRenderers.Count == 0)
         {
-            Debug.LogWarning("No specified body renderers found!");
             return;
         }
 
         if (material == null)
         {
-            Debug.LogError("Material is null!");
             return;
         }
 
@@ -303,8 +343,6 @@ public class RatController : MonoBehaviour
                 renderer.material = material;
             }
         }
-
-        Debug.Log($"Applied material '{material.name}' to {bodyRenderers.Count} body parts");
     }
 
     // Helper method to fade out renderers

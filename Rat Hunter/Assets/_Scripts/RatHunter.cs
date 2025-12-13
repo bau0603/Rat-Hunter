@@ -138,10 +138,32 @@ public class RatHunter : MonoBehaviour
         UpdateUI();
     }
 
-    public void LoseLife()
+    // NEW: Method to apply score penalty
+    public void ApplyScorePenalty(int penalty)
+    {
+        if (penalty <= 0) return;
+
+        // Apply negative score
+        currentScore -= penalty;
+        if (currentScore < 0) currentScore = 0;
+        runningScore = currentScore; // Update persistent score
+        UpdateUI();
+    }
+
+    // Updated LoseLife method to optionally accept score penalty
+    public void LoseLife(int scorePenalty = 0)
     {
         playerLives--;
-        UpdateUI();
+
+        // Apply score penalty if provided
+        if (scorePenalty > 0)
+        {
+            ApplyScorePenalty(scorePenalty);
+        }
+        else
+        {
+            UpdateUI();
+        }
 
         if (playerLives <= 0)
         {
@@ -178,6 +200,9 @@ public class RatHunter : MonoBehaviour
         // NEW: Reset persistent score to what it was at level start
         runningScore = levelStartScore;
 
+        // Clean up scene objects before loading
+        CleanupSceneObjects();
+
         // Resume normal time scale before loading new scene
         Time.timeScale = 1f;
 
@@ -188,6 +213,9 @@ public class RatHunter : MonoBehaviour
     public void ContinueToNextLevel()
     {
         Debug.Log("Continue button clicked");
+
+        // Clean up scene objects before loading
+        CleanupSceneObjects();
 
         // Resume normal time scale
         Time.timeScale = 1f;
@@ -223,6 +251,9 @@ public class RatHunter : MonoBehaviour
     {
         Debug.Log("Menu button clicked");
 
+        // Clean up scene objects before loading
+        CleanupSceneObjects();
+
         // NEW: Reset persistent score to zero
         runningScore = 0;
 
@@ -242,6 +273,7 @@ public class RatHunter : MonoBehaviour
                sceneName == "StartMenu";
     }
 
+    // UPDATED: Now uses DecoyBehavior instead of DecoyInstance
     void CleanupSceneObjects()
     {
         // Clear all rats
@@ -251,9 +283,9 @@ public class RatHunter : MonoBehaviour
             Destroy(rat.gameObject);
         }
 
-        // Clear all Decoy objects
-        DecoyInstance[] decoys = FindObjectsOfType<DecoyInstance>();
-        foreach (DecoyInstance decoy in decoys)
+        // Clear all Decoy objects (using DecoyBehavior instead of DecoyInstance)
+        DecoyBehavior[] decoys = FindObjectsOfType<DecoyBehavior>();
+        foreach (DecoyBehavior decoy in decoys)
         {
             Destroy(decoy.gameObject);
         }

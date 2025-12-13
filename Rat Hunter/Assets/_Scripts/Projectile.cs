@@ -102,10 +102,11 @@ public class Projectile : MonoBehaviour
         }
         else if (other.CompareTag("Decoy"))
         {
-            DecoyInstance decoy = other.GetComponent<DecoyInstance>();
+            // Updated to use DecoyBehavior instead of DecoyInstance
+            DecoyBehavior decoy = other.GetComponent<DecoyBehavior>();
             if (decoy != null)
             {
-                decoy.HitByProjectile();
+                decoy.OnHitByProjectile();
                 print("Decoy hit! Life lost.");
             }
             DestroyProjectile();

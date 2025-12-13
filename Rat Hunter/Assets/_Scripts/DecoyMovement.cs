@@ -1,172 +1,141 @@
 using UnityEngine;
-using System.Collections;
 
-public class DecoyInstance : MonoBehaviour
+public class DecoyMovement : MonoBehaviour
 {
-    private DecoySpawner decoyManager;
+    [Header("Movement Settings")]
+    public float moveSpeed = 5f;
+    public Vector3 movementDirection = Vector3.right;
 
-    [Header("Decoy Behavior")]
-    public float moveSpeed = 3f;
-    public int scorePenalty = 1;
-    public float lifeTime = 3f;
+    [Header("Physics Settings")]
+    public float bounceForce = 2f;
+    public float bounceCooldown = 0.5f;
+    private float lastBounceTime = 0f;
 
-    private Renderer decoyRenderer;
-    private bool isHit = false;
-    private Coroutine fadeCoroutine;
+    private Rigidbody rb;
+    private bool isActive = true;
 
-    // --- MOVEMENT VARIABLES ---
-    private bool movesRight;
-    private float minBoundX;
-    private float maxBoundX;
-    // --------------------------
-
-    public void Initialize(DecoySpawner manager, bool startMovesRight, float minX, float maxX)
+    void Start()
     {
-        decoyManager = manager;
-        decoyRenderer = GetComponent<Renderer>();
-
-        // Movement initialization
-        movesRight = startMovesRight;
-        minBoundX = minX;
-        maxBoundX = maxX;
-
-        // Start lifetime countdown
-        if (fadeCoroutine != null)
+        rb = GetComponent<Rigidbody>();
+        if (rb == null)
         {
-            StopCoroutine(fadeCoroutine);
+            rb = gameObject.AddComponent<Rigidbody>();
         }
-        fadeCoroutine = StartCoroutine(FadeOutBeforeDestroy());
-    }
 
-    // Alternative initialization method that can override public fields
-    public void Initialize(DecoySpawner manager, bool startMovesRight, float minX, float maxX,
-                           float overrideMoveSpeed = -1f, int overrideScorePenalty = -1,
-                           float overrideLifetime = -1f)
-    {
-        decoyManager = manager;
-        decoyRenderer = GetComponent<Renderer>();
+        // Set up Rigidbody for rolling
+        rb.useGravity = true;
+        rb.drag = 0.5f;
+        rb.angularDrag = 0.5f;
+        rb.constraints = RigidbodyConstraints.FreezePositionY;
 
-        // Movement initialization
-        movesRight = startMovesRight;
-        minBoundX = minX;
-        maxBoundX = maxX;
-
-        // Override public fields if parameters are provided
-        if (overrideMoveSpeed > 0) moveSpeed = overrideMoveSpeed;
-        if (overrideScorePenalty >= 0) scorePenalty = overrideScorePenalty;
-        if (overrideLifetime > 0) lifeTime = overrideLifetime;
-
-        // Start lifetime countdown
-        if (fadeCoroutine != null)
+        // Apply initial impulse
+        if (rb != null)
         {
-            StopCoroutine(fadeCoroutine);
-        }
-        fadeCoroutine = StartCoroutine(FadeOutBeforeDestroy());
-    }
-
-    void Update()
-    {
-        if (isHit) return;
-
-        // --- MOVEMENT LOGIC ---
-        float direction = movesRight ? 1f : -1f;
-        // Move the object horizontally based on speed and direction
-        Vector3 movement = new Vector3(direction * moveSpeed * Time.deltaTime, 0, 0);
-        transform.position += movement;
-
-        // Check boundary conditions and reverse direction if a boundary is hit
-        if (transform.position.x >= maxBoundX)
-        {
-            movesRight = false;
-            // Snap to the boundary to prevent overshooting
-            transform.position = new Vector3(maxBoundX, transform.position.y, transform.position.z);
-        }
-        else if (transform.position.x <= minBoundX)
-        {
-            movesRight = true;
-            // Snap to the boundary to prevent overshooting
-            transform.position = new Vector3(minBoundX, transform.position.y, transform.position.z);
-        }
-        // ----------------------
-    }
-
-    public void HitByProjectile()
-    {
-        if (isHit) return;
-
-        isHit = true;
-        decoyManager?.HitByProjectile(this);
-
-        if (fadeCoroutine != null)
-        {
-            StopCoroutine(fadeCoroutine);
-        }
-        StartCoroutine(FadeAndDestroy());
-    }
-
-    private IEnumerator FadeOutBeforeDestroy()
-    {
-        yield return new WaitForSeconds(lifeTime - 1f);
-
-        if (!isHit)
-        {
-            yield return StartCoroutine(FadeAndDestroy());
+            rb.AddForce(movementDirection * moveSpeed * 2f, ForceMode.Impulse);
         }
     }
 
-    private IEnumerator FadeAndDestroy()
+    void FixedUpdate()
     {
-        float fadeTime = 1f;
-        float currentTime = 0f;
+        if (!isActive || rb == null) return;
 
-        if (decoyRenderer != null)
+        HandleMovement();
+        HandleRolling();
+    }
+
+    void HandleMovement()
+    {
+        // Apply continuous force in movement direction
+        rb.AddForce(movementDirection * moveSpeed, ForceMode.Acceleration);
+    }
+
+    void HandleRolling()
+    {
+        // Calculate rolling rotation based on velocity
+        if (rb.velocity.magnitude > 0.1f)
         {
-            Material mat = decoyRenderer.material;
-            Color originalColor = mat.color;
+            // Calculate rotation angle based on distance traveled
+            float rotationSpeed = rb.velocity.magnitude * Time.fixedDeltaTime * 360f;
+            float circumference = CalculateCircumference();
 
-            while (currentTime < fadeTime && mat != null)
+            if (circumference > 0)
             {
-                currentTime += Time.deltaTime;
-                float alpha = Mathf.Lerp(1f, 0f, currentTime / fadeTime);
-                mat.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
-                yield return null;
+                rotationSpeed = (rb.velocity.magnitude * Time.fixedDeltaTime / circumference) * 360f;
+            }
+
+            // Apply rotation around axis perpendicular to movement and up direction
+            Vector3 rotationAxis = Vector3.Cross(Vector3.up, movementDirection).normalized;
+            transform.Rotate(rotationAxis, rotationSpeed, Space.World);
+        }
+    }
+
+    float CalculateCircumference()
+    {
+        // Estimate circumference for rolling calculation
+        Collider collider = GetComponent<Collider>();
+        if (collider != null)
+        {
+            Bounds bounds = collider.bounds;
+            // Average of width and depth for cylindrical objects
+            return Mathf.PI * ((bounds.size.x + bounds.size.z) / 2f);
+        }
+        return 1f;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        // Check if we should bounce off this object
+        if (bounceForce > 0)
+        {
+            // Only bounce if cooldown has passed
+            if (Time.time - lastBounceTime >= bounceCooldown)
+            {
+                // Calculate bounce direction from collision normal
+                Vector3 bounceDirection = Vector3.Reflect(movementDirection, collision.contacts[0].normal);
+                bounceDirection.y = 0;
+                bounceDirection = bounceDirection.normalized;
+
+                Bounce(bounceDirection);
+                lastBounceTime = Time.time;
             }
         }
-
-        Destroy(gameObject);
     }
 
-    void OnTriggerEnter(Collider other)
+    void Bounce(Vector3 newDirection)
     {
-        if (isHit) return;
+        movementDirection = newDirection.normalized;
 
-        // Assuming Projectile is a component on your projectiles
-        Projectile projectile = other.GetComponent<Projectile>();
-        if (projectile != null)
+        // Apply bounce force
+        if (rb != null)
         {
-            HitByProjectile();
-
-            // Destroy the projectile
-            Destroy(other.gameObject);
+            rb.velocity = new Vector3(rb.velocity.x * 0.5f, rb.velocity.y, rb.velocity.z);
+            rb.AddForce(movementDirection * bounceForce, ForceMode.Impulse);
         }
     }
 
-    void OnDestroy()
+    public void SetActive(bool active)
     {
-        if (fadeCoroutine != null)
+        isActive = active;
+        if (rb != null && !active)
         {
-            StopCoroutine(fadeCoroutine);
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
         }
     }
-}
 
-// Helper component to track decoy destruction and update the manager's count
-public class DecoyTracker : MonoBehaviour
-{
-    public System.Action OnDecoyDestroyed;
-
-    void OnDestroy()
+    public void ReverseDirection()
     {
-        OnDecoyDestroyed?.Invoke();
+        movementDirection = -movementDirection;
+        Bounce(movementDirection);
+    }
+
+    public void SetMovementDirection(Vector3 direction)
+    {
+        movementDirection = direction.normalized;
+    }
+
+    public void SetMoveSpeed(float speed)
+    {
+        moveSpeed = speed;
     }
 }

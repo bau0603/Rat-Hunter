@@ -348,7 +348,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 8, y: 2.7210994, z: -5.7579193}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6974738044979674056}
@@ -384,7 +384,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 116
+  m_Constraints: 120
   m_CollisionDetection: 1
 --- !u!65 &-3789963011428242122
 BoxCollider:
@@ -421,8 +421,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentState: 0
   spawnY: -9
+  spawnZ: 2
   moveSpeed: 5
   directionChangeInterval: 1
+  jumpForce: 0
+  jumpInterval: 0
+  jumpCooldown: 0
   tranquilizedDuration: 5
   tranquilizedSpeed: 1
   normalMaterial: {fileID: 2100000, guid: 29b7d7a81c218564499be4a4bcc4d9d3, type: 2}

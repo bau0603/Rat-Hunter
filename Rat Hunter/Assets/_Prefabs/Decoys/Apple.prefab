@@ -116,9 +116,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6436542956442415662}
-  - component: {fileID: -2262654224857583187}
   - component: {fileID: -274283996552641827}
   - component: {fileID: -677684299713082059}
+  - component: {fileID: -2262654224857583187}
+  - component: {fileID: -1961091992690503574}
   m_Layer: 9
   m_Name: Apple
   m_TagString: Decoy
@@ -143,21 +144,6 @@ Transform:
   - {fileID: 7154721697630644146}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0.01, z: 0}
---- !u!114 &-2262654224857583187
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2766267015278326924}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6320f97ca79d2e42a2ab5885e4507cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 3
-  scorePenalty: 50
-  lifeTime: 5
 --- !u!65 &-274283996552641827
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -204,8 +190,44 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 32
+  m_Constraints: 72
   m_CollisionDetection: 0
+--- !u!114 &-2262654224857583187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2766267015278326924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6320f97ca79d2e42a2ab5885e4507cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  decoyType: 0
+  scorePenalty: 50
+  lifetime: 5
+  moveSpeed: 5
+  movementDirection: {x: 0, y: 1, z: 0}
+  bounceForce: 2
+  bounceCooldown: 0.5
+  isHit: 0
+--- !u!114 &-1961091992690503574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2766267015278326924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71aefd72795b05b4ca47596296c97ec4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 5
+  movementDirection: {x: 0, y: 1, z: 1}
+  bounceForce: 2
+  bounceCooldown: 0.5
 --- !u!1 &5519407493157223892
 GameObject:
   m_ObjectHideFlags: 0

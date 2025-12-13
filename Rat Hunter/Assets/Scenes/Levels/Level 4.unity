@@ -282,11 +282,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
       propertyPath: totalChanceDisplay
-      value: 1.5999999
+      value: 2.1999998
       objectReference: {fileID: 0}
     - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
       propertyPath: ratPrefabs.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
       propertyPath: ratPrefabs.Array.data[2]
@@ -304,6 +304,10 @@ PrefabInstance:
       propertyPath: ratPrefabs.Array.data[2].prefab
       value: 
       objectReference: {fileID: 5681190576489505949, guid: 9833d267c1df16c4e9b29f4c5ef16b79, type: 3}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: ratPrefabs.Array.data[3].prefab
+      value: 
+      objectReference: {fileID: 5681190576489505949, guid: 997e37ae1902ee34a9ac29d17436683d, type: 3}
     - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
       propertyPath: ratPrefabs.Array.data[0].spawnChance
       value: 0.7
@@ -323,6 +327,14 @@ PrefabInstance:
     - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
       propertyPath: ratPrefabs.Array.data[2].spawnChance
       value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: ratPrefabs.Array.data[3].ratTypeName
+      value: Jumpy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3932839782958819340, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
+      propertyPath: ratPrefabs.Array.data[3].spawnChance
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 7754932935482732917, guid: 792660da6b2734a48bda26f87825b9f9, type: 3}
       propertyPath: m_Name
@@ -411,8 +423,8 @@ Transform:
   m_GameObject: {fileID: 1243026557}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 4, y: 4, z: 4}
+  m_LocalPosition: {x: 0, y: 0, z: 100}
+  m_LocalScale: {x: 4.5, y: 4.5, z: 4.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -805,8 +817,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8729427294835324019, guid: 4a80a284ce62e194c9a6fb9a14b75d92, type: 3}
       propertyPath: yPosition
-      value: 0.2
+      value: -9
       objectReference: {fileID: 0}
+    - target: {fileID: 8729427294835324019, guid: 4a80a284ce62e194c9a6fb9a14b75d92, type: 3}
+      propertyPath: decoyPrefabs.Array.data[1]
+      value: 
+      objectReference: {fileID: 1460685006712728910, guid: b1f363e794d36cb468ef615b6bcc4b10, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
